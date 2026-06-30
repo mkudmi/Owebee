@@ -1,5 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { ZodError } from "zod";
+import { parseBearerToken, unauthorized } from "../http/bearer.js";
 import { DuplicateEmailError, InvalidSessionError } from "./auth-service.js";
 import type { AuthService } from "./auth-service.js";
 
@@ -46,12 +47,7 @@ export async function registerAuthRoutes(
     const token = parseBearerToken(authorizationHeader);
 
     if (!token) {
-      return reply.code(401).send({
-        error: {
-          code: "auth.unauthorized",
-          message: "Authentication is required"
-        }
-      });
+      return unauthorized(reply);
     }
 
     try {
@@ -59,24 +55,10 @@ export async function registerAuthRoutes(
       return { user };
     } catch (error) {
       if (error instanceof InvalidSessionError) {
-        return reply.code(401).send({
-          error: {
-            code: "auth.unauthorized",
-            message: "Authentication is required"
-          }
-        });
+        return unauthorized(reply);
       }
 
       throw error;
     }
   });
-}
-
-function parseBearerToken(header: string | undefined): string | null {
-  if (!header?.startsWith("Bearer ")) {
-    return null;
-  }
-
-  const token = header.slice("Bearer ".length).trim();
-  return token.length > 0 ? token : null;
 }

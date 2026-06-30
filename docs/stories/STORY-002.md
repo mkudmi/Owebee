@@ -4,7 +4,7 @@
 - **Epic:** EPIC-001 - Доступ, аккаунты и гостевые сессии
 - **Priority:** Must Have
 - **Story Points:** 5
-- **Status:** Not Started
+- **Status:** Completed
 
 ## User Story
 
@@ -128,4 +128,14 @@ Response:
 
 ## Implementation Notes
 
-To be filled during implementation.
+Implemented in Sprint 2.
+
+- Added `POST /api/v1/invites/{inviteToken}/join`.
+- Validates display name, email and locale for public invite join.
+- Creates active guest `trip_members` row and durable `guest_sessions` row transactionally.
+- Stores only guest session hash; raw guest session token is returned once in the join response.
+- Rejects invalid/revoked invites and returns `invites.recovery_required` for duplicate guest email within the same trip.
+
+Test evidence:
+
+- `apps/api/src/sprint2.test.ts`

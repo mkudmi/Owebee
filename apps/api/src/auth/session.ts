@@ -1,10 +1,17 @@
 import { createHash, randomBytes } from "node:crypto";
 
-export function createSessionToken(): string {
+export function createOpaqueToken(): string {
   return randomBytes(32).toString("base64url");
 }
 
-export function hashSessionToken(token: string): string {
+export function hashOpaqueToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
 
+export function createSessionToken(): string {
+  return createOpaqueToken();
+}
+
+export function hashSessionToken(token: string): string {
+  return hashOpaqueToken(token);
+}

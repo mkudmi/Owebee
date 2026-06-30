@@ -4,7 +4,7 @@
 - **Sprint Dates:** 2026-06-30 - 2026-07-13
 - **Sprint Duration:** 2 weeks / 10 working days
 - **Created:** 2026-06-30
-- **Status:** Planned
+- **Status:** Completed
 
 ## Sprint Overview
 
@@ -37,7 +37,7 @@
 #### STORY-023: Currency catalog foundation and provider contract
 - **Priority:** Must Have
 - **Points:** 5
-- **Status:** Not Started
+- **Status:** Completed
 - **Dependencies:** STORY-020, STORY-021
 - **Brief:** Добавить каталог популярных валют Европы, СНГ, USD и EUR, API для списка валют и интерфейс adapter для будущего получения курсов.
 
@@ -50,7 +50,7 @@
 #### STORY-004: Create trip and invite link
 - **Priority:** Must Have
 - **Points:** 5
-- **Status:** Not Started
+- **Status:** Completed
 - **Dependencies:** STORY-001, STORY-021, STORY-023
 - **Brief:** Реализовать `POST /api/v1/trips`, создание owner member и активного invite token без хранения raw token.
 
@@ -63,7 +63,7 @@
 #### STORY-002: Guest join by invite link
 - **Priority:** Must Have
 - **Points:** 5
-- **Status:** Not Started
+- **Status:** Completed
 - **Dependencies:** STORY-004
 - **Brief:** Реализовать `POST /api/v1/invites/{inviteToken}/join`, создание guest member и долговечной guest session.
 
@@ -76,7 +76,7 @@
 #### STORY-007: Create family with share count
 - **Priority:** Must Have
 - **Points:** 5
-- **Status:** Not Started
+- **Status:** Completed
 - **Dependencies:** STORY-004
 - **Brief:** Реализовать family aggregate в поездке, validate `shareCount > 0`, отображение семьи в участниках и основу для будущих расчетов.
 
@@ -162,7 +162,7 @@ A story is complete when:
 
 | Date | Completed | Remaining | Ideal Remaining | Notes |
 |------|-----------|-----------|-----------------|-------|
-| 2026-06-30 | 0 | 20 | 20 | Sprint 2 planned |
+| 2026-06-30 | 20 | 0 | 20 | Sprint 2 implemented |
 | 2026-07-02 | To update | To update | 16 | Target: STORY-023 complete |
 | 2026-07-06 | To update | To update | 10 | Target: STORY-004 complete |
 | 2026-07-09 | To update | To update | 5 | Target: STORY-002 complete |

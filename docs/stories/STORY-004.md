@@ -4,7 +4,7 @@
 - **Epic:** EPIC-002 - Поездки и управление жизненным циклом
 - **Priority:** Must Have
 - **Story Points:** 5
-- **Status:** Not Started
+- **Status:** Completed
 
 ## User Story
 
@@ -124,4 +124,14 @@ Response:
 
 ## Implementation Notes
 
-To be filled during implementation.
+Implemented in Sprint 2.
+
+- Added `POST /api/v1/trips` for authenticated registered owners.
+- Validates base currency through the currency catalog and normalizes lowercase input.
+- Creates trip, owner `trip_members` row and active invite in one transaction.
+- Stores only invite token hash; raw invite token is returned only inside the generated invite link.
+- Handles invalid payloads, unsupported currencies, unauthenticated requests and duplicate active trip names.
+
+Test evidence:
+
+- `apps/api/src/sprint2.test.ts`

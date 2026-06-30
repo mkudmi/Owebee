@@ -1,6 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { ZodError } from "zod";
 import { InvalidSessionError, type AuthService } from "../auth/auth-service.js";
+import { parseBearerToken, unauthorized } from "../http/bearer.js";
 import type { SyncService } from "./sync-service.js";
 
 export interface SyncRoutesOptions {
@@ -36,26 +37,6 @@ export async function registerSyncRoutes(
       }
 
       throw error;
-    }
-  });
-}
-
-function parseBearerToken(header: string | undefined): string | null {
-  if (!header?.startsWith("Bearer ")) {
-    return null;
-  }
-
-  const token = header.slice("Bearer ".length).trim();
-  return token.length > 0 ? token : null;
-}
-
-function unauthorized(reply: {
-  code(statusCode: number): { send(payload: unknown): unknown };
-}) {
-  return reply.code(401).send({
-    error: {
-      code: "auth.unauthorized",
-      message: "Authentication is required"
     }
   });
 }

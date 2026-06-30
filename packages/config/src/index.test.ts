@@ -13,6 +13,7 @@ describe("loadConfig", () => {
 
     expect(config.API_PORT).toBe(4100);
     expect(config.NODE_ENV).toBe("test");
+    expect(config.WEB_BASE_URL).toBe("http://localhost:5173");
   });
 
   it("fails fast when required variables are missing", () => {
@@ -21,4 +22,3 @@ describe("loadConfig", () => {
     );
   });
 });
-

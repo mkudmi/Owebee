@@ -4,7 +4,7 @@
 - **Epic:** EPIC-005 - Валюты и курсы
 - **Priority:** Must Have
 - **Story Points:** 5
-- **Status:** Not Started
+- **Status:** Completed
 
 ## User Story
 
@@ -114,4 +114,15 @@ Currency catalog is public read-only data. Mutation endpoints are not in scope.
 
 ## Implementation Notes
 
-To be filled during implementation.
+Implemented in Sprint 2.
+
+- Added durable `currencies` catalog and seed migration in `apps/api/migrations/0003_sprint2_trips_currency_invites_families.sql`.
+- Added `GET /api/v1/currencies` with active currencies sorted by catalog order.
+- Added shared server-side currency normalization and active-code validation.
+- Added `CurrencyRateProvider` contract plus deterministic `FakeCurrencyRateProvider` for tests.
+- Kept automatic conversion and rate snapshot persistence out of scope.
+
+Test evidence:
+
+- `apps/api/src/currency/currency-service.test.ts`
+- `apps/api/src/sprint2.test.ts`

@@ -29,7 +29,11 @@ describe("migrations", () => {
 
     const applied = await applyMigrations(db, migrations);
 
-    expect(applied).toEqual(["0001_core_baseline", "0002_sync_mutations"]);
+    expect(applied).toEqual([
+      "0001_core_baseline",
+      "0002_sync_mutations",
+      "0003_sprint2_trips_currency_invites_families"
+    ]);
 
     const tables = await db.query<{ table_name: string }>(`
       select table_name
@@ -42,6 +46,9 @@ describe("migrations", () => {
       expect.arrayContaining([
         "audit_events",
         "auth_sessions",
+        "currencies",
+        "families",
+        "guest_sessions",
         "trip_invites",
         "trip_members",
         "trips",

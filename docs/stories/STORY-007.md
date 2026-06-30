@@ -4,7 +4,7 @@
 - **Epic:** EPIC-003 - Участники, семьи и доли
 - **Priority:** Must Have
 - **Story Points:** 5
-- **Status:** Not Started
+- **Status:** Completed
 
 ## User Story
 
@@ -124,4 +124,13 @@ Family creation is owner-only. Server must check ownership from session context,
 
 ## Implementation Notes
 
-To be filled during implementation.
+Implemented in Sprint 2.
+
+- Added `POST /api/v1/trips/{tripId}/families` for owner-only family aggregate creation.
+- Added `GET /api/v1/trips/{tripId}/participants` so created families appear in trip participant context.
+- Preserves decimal `shareCount` as submitted while enforcing `shareCount > 0`.
+- Rejects guest/non-owner creation, duplicate active family names and archived/deleted trips.
+
+Test evidence:
+
+- `apps/api/src/sprint2.test.ts`
