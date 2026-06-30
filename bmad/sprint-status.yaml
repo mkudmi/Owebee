@@ -1,6 +1,6 @@
 project: Owebee
 project_level: 3
-current_sprint: 2
+current_sprint: 3
 
 sprint_config:
   duration_weeks: 2
@@ -13,10 +13,15 @@ velocity_history:
     completed: 20
     completion_rate: 100
     notes: "Initial foundation sprint completed."
+  - sprint: 2
+    planned: 20
+    completed: 20
+    completion_rate: 100
+    notes: "Trip, invite, guest join, family and currency foundation completed."
 
 velocity_metrics:
   three_sprint_average: 20
-  trend: "baseline_established"
+  trend: "insufficient_data"
   recommended_capacity: 20
 
 sprints:
@@ -146,7 +151,7 @@ sprints:
       notes: "Sprint 1 scope completed; Colima/Docker live smoke passed for PostgreSQL, Redis, migrations, auth and sync."
 
   - number: 2
-    status: "planned"
+    status: "completed"
     start_date: "2026-06-30"
     end_date: "2026-07-13"
     sprint_goal: "Создать первый продуктовый контур поездки: каталог валют, создание поездки с invite link, гостевой вход и семейная группа."
@@ -165,9 +170,9 @@ sprints:
         epic: "EPIC-005"
         priority: "Must Have"
         points: 5
-        status: "not_started"
-        started_date: null
-        completed_date: null
+        status: "completed"
+        started_date: "2026-06-30"
+        completed_date: "2026-06-30"
         dependencies: ["STORY-020", "STORY-021"]
         blocked_by: null
         notes: "Foundation split from STORY-012 to keep automatic rate conversion out of Sprint 2."
@@ -177,9 +182,9 @@ sprints:
         epic: "EPIC-002"
         priority: "Must Have"
         points: 5
-        status: "not_started"
-        started_date: null
-        completed_date: null
+        status: "completed"
+        started_date: "2026-06-30"
+        completed_date: "2026-06-30"
         dependencies: ["STORY-001", "STORY-021", "STORY-023"]
         blocked_by: null
         notes: "Creates trip, owner member and active invite token."
@@ -189,9 +194,9 @@ sprints:
         epic: "EPIC-001"
         priority: "Must Have"
         points: 5
-        status: "not_started"
-        started_date: null
-        completed_date: null
+        status: "completed"
+        started_date: "2026-06-30"
+        completed_date: "2026-06-30"
         dependencies: ["STORY-004"]
         blocked_by: null
         notes: "Correct PRD mapping for guest join; STORY-005 remains base currency editing."
@@ -201,9 +206,9 @@ sprints:
         epic: "EPIC-003"
         priority: "Must Have"
         points: 5
-        status: "not_started"
-        started_date: null
-        completed_date: null
+        status: "completed"
+        started_date: "2026-06-30"
+        completed_date: "2026-06-30"
         dependencies: ["STORY-004"]
         blocked_by: null
         notes: "Creates aggregate family model for later split calculations."
@@ -211,20 +216,20 @@ sprints:
     metrics:
       total_stories: 4
       total_points: 20
-      completed_stories: 0
-      completed_points: 0
+      completed_stories: 4
+      completed_points: 20
       in_progress_stories: 0
       in_progress_points: 0
-      remaining_stories: 4
-      remaining_points: 20
-      completion_percentage: 0
+      remaining_stories: 0
+      remaining_points: 0
+      completion_percentage: 100
 
     burndown:
       - date: "2026-06-30"
-        completed_points: 0
-        remaining_points: 20
+        completed_points: 20
+        remaining_points: 0
         ideal_remaining: 20
-        notes: "Sprint 2 planned"
+        notes: "Sprint 2 scope completed"
       - date: "2026-07-02"
         completed_points: null
         remaining_points: null
@@ -272,7 +277,128 @@ sprints:
       blockers_count: 0
       risks_count: 3
       team_morale: "high"
-      notes: "Sprint 2 planned at 20 points using Sprint 1 velocity baseline."
+      notes: "Sprint 2 completed at 20/20 points; API and PostgreSQL integration evidence is recorded in story files."
+
+  - number: 3
+    status: "planned"
+    start_date: "2026-07-14"
+    end_date: "2026-07-27"
+    sprint_goal: "Deliver the first complete online expense flow with validated splits, immutable exchange-rate snapshots and shared expense history."
+    capacity: 20
+
+    capacity_breakdown:
+      base_capacity: 20
+      adjustments:
+        - reason: "Commit 19 points and retain 1 point for first financial-data slice contingency"
+          impact: -1
+      final_capacity: 19
+
+    stories:
+      - id: "STORY-009"
+        title: "Add a base-currency expense"
+        epic: "EPIC-004"
+        priority: "Must Have"
+        points: 8
+        status: "not_started"
+        started_date: null
+        completed_date: null
+        dependencies: ["STORY-004", "STORY-007", "STORY-023"]
+        blocked_by: null
+        notes: "Thin vertical slice for canonical expense, splits, authorization and idempotency; cross-currency support follows in STORY-012."
+
+      - id: "STORY-012"
+        title: "Automatic exchange rate and immutable snapshot"
+        epic: "EPIC-005"
+        priority: "Must Have"
+        points: 8
+        status: "not_started"
+        started_date: null
+        completed_date: null
+        dependencies: ["STORY-009", "STORY-023"]
+        blocked_by: null
+        notes: "Extends expense creation to cross-currency conversion with immutable provider snapshot."
+
+      - id: "STORY-011"
+        title: "View all trip expenses"
+        epic: "EPIC-004"
+        priority: "Should Have"
+        points: 3
+        status: "not_started"
+        started_date: null
+        completed_date: null
+        dependencies: ["STORY-009"]
+        blocked_by: null
+        notes: "Shared paginated history for every active trip member."
+
+    metrics:
+      total_stories: 3
+      total_points: 19
+      completed_stories: 0
+      completed_points: 0
+      in_progress_stories: 0
+      in_progress_points: 0
+      remaining_stories: 3
+      remaining_points: 19
+      completion_percentage: 0
+
+    burndown:
+      - date: "2026-07-14"
+        completed_points: 0
+        remaining_points: 19
+        ideal_remaining: 19
+        notes: "Sprint 3 begins"
+      - date: "2026-07-17"
+        completed_points: null
+        remaining_points: null
+        ideal_remaining: 13
+        notes: "Target: STORY-009 complete"
+      - date: "2026-07-22"
+        completed_points: null
+        remaining_points: null
+        ideal_remaining: 6
+        notes: "Target: STORY-012 complete"
+      - date: "2026-07-24"
+        completed_points: null
+        remaining_points: null
+        ideal_remaining: 2
+        notes: "Target: STORY-011 complete"
+      - date: "2026-07-27"
+        completed_points: null
+        remaining_points: null
+        ideal_remaining: 0
+        notes: "Sprint end and integration hardening"
+
+    risks:
+      - description: "Decimal money values lose precision in JavaScript"
+        impact: "high"
+        status: "active"
+        mitigation: "Use PostgreSQL numeric, decimal strings at API boundaries and decimal-safe arithmetic."
+      - description: "Currency provider failure creates partial expense data"
+        impact: "high"
+        status: "active"
+        mitigation: "Resolve and validate the rate before one atomic expense transaction."
+      - description: "Split target references an inactive entity or another trip"
+        impact: "high"
+        status: "active"
+        mitigation: "Validate payer and every split target against active entities in the route trip."
+      - description: "Expense story expands into balance calculation"
+        impact: "medium"
+        status: "active"
+        mitigation: "Persist calculation-ready split weights only; keep balances in EPIC-006."
+
+    blockers:
+      - story_id: null
+        description: "No active blockers"
+        reported_date: null
+        resolved_date: null
+
+    health:
+      velocity_on_track: true
+      burndown_on_track: true
+      blockers_count: 0
+      risks_count: 4
+      team_morale: "high"
+      notes: "Sprint 3 planned at 19 committed points against a stable 20-point velocity."
 
 backlog:
   - id: "STORY-005"
@@ -281,64 +407,64 @@ backlog:
     priority: "Must Have"
     points: 8
     status: "not_started"
-    sprint_planned: 3
+    sprint_planned: 4
   - id: "STORY-006"
     title: "Archive and delete trip"
     epic: "EPIC-002"
     priority: "Must Have"
     points: 5
     status: "not_started"
-    sprint_planned: 3
-  - id: "STORY-012"
-    title: "Automatic currency rate and snapshot"
-    epic: "EPIC-005"
-    priority: "Must Have"
-    points: 8
-    status: "not_started"
-    sprint_planned: 3
+    sprint_planned: 4
   - id: "STORY-016"
     title: "Offline expense creation"
     epic: "EPIC-007"
     priority: "Must Have"
     points: 8
     status: "not_started"
-    sprint_planned: 3
+    sprint_planned: 4
 
 epics:
   - name: "Technical Foundation"
+    total_stories: 2
+    total_points: 10
+    completed_stories: 2
+    completed_points: 10
+    progress_percentage: 100
+    target_sprint: 1
+  - name: "EPIC-001"
     total_stories: 3
     total_points: 15
     completed_stories: 2
     completed_points: 10
     progress_percentage: 66.7
-    target_sprint: 1
-  - name: "EPIC-001"
-    total_stories: 3
-    total_points: 15
-    completed_stories: 1
-    completed_points: 5
-    progress_percentage: 33.3
     target_sprint: 2
   - name: "EPIC-002"
     total_stories: 3
     total_points: 18
-    completed_stories: 0
-    completed_points: 0
-    progress_percentage: 0
+    completed_stories: 1
+    completed_points: 5
+    progress_percentage: 27.8
     target_sprint: 2
   - name: "EPIC-003"
     total_stories: 2
     total_points: 10
+    completed_stories: 1
+    completed_points: 5
+    progress_percentage: 50
+    target_sprint: 2
+  - name: "EPIC-004"
+    total_stories: 3
+    total_points: 16
     completed_stories: 0
     completed_points: 0
     progress_percentage: 0
-    target_sprint: 2
+    target_sprint: 3
   - name: "EPIC-005"
     total_stories: 3
-    total_points: 21
-    completed_stories: 0
-    completed_points: 0
-    progress_percentage: 0
+    total_points: 18
+    completed_stories: 1
+    completed_points: 5
+    progress_percentage: 27.8
     target_sprint: 2
   - name: "EPIC-007"
     total_stories: 3
@@ -350,17 +476,17 @@ epics:
 
 project_progress:
   total_epics: 9
-  completed_epics: 0
+  completed_epics: 1
   total_stories: 23
-  completed_stories: 4
+  completed_stories: 8
   total_points: 142
-  completed_points: 20
-  progress_percentage: 14.1
-  sprints_completed: 1
-  sprints_remaining: 6
+  completed_points: 40
+  progress_percentage: 28.2
+  sprints_completed: 2
+  sprints_remaining: 5
   estimated_completion_date: "2026-09-22"
 
 retrospectives: []
 
-last_updated: "2026-06-30 16:20:00"
+last_updated: "2026-06-30 19:37:54"
 updated_by: "scrum-master"

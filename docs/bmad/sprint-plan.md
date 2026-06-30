@@ -1,183 +1,185 @@
 # Sprint Plan: Owebee
 
-- **Sprint Number:** 2
-- **Sprint Dates:** 2026-06-30 - 2026-07-13
+- **Sprint Number:** 3
+- **Sprint Dates:** 2026-07-14 - 2026-07-27
 - **Sprint Duration:** 2 weeks / 10 working days
 - **Created:** 2026-06-30
-- **Status:** Completed
+- **Status:** Planned
 
 ## Sprint Overview
 
-**Sprint Goal:** Дать Owebee первый рабочий продуктовый контур поездки: owner создает поездку с базовой валютой и invite link, гость присоединяется по ссылке, owner создает семейную группу, а валюта поездки валидируется через поддерживаемый каталог валют.
+**Sprint Goal:** Deliver the first complete online expense flow: a trip participant can create an expense with validated split targets, the system persists an immutable exchange-rate snapshot for cross-currency expenses, and every trip member can view the shared expense history.
 
-**Sprint Capacity:** 20 story points  
-**Stories Planned:** 4 stories  
-**Total Story Points:** 20 points
+**Sprint Capacity:** 20 story points
+**Stories Planned:** 3 stories
+**Total Story Points:** 19 points
 
 **Capacity Calculation:**
-- **Baseline velocity:** 20 points по Sprint 1.
+- **Baseline velocity:** 20 points in Sprint 1 and 20 points in Sprint 2.
 - **Team:** 1 full-stack developer.
-- **Adjustment:** capacity оставлена на уровне 20 points, потому что Sprint 2 впервые затрагивает реальную доменную модель trips/members/currencies и access control.
+- **Adjustment:** Commit 19 points and keep 1 point as contingency for the first financial-data slice.
 
 ## Velocity Metrics
 
 **Historical Velocity:**
 - Sprint 1: planned 20, completed 20, completion rate 100%.
+- Sprint 2: planned 20, completed 20, completion rate 100%.
+- Two-sprint average: 20 points.
 
 **Recommended Capacity:** 20 points.
 
-**Planning Note:** STORY-012 из PRD про автоматический курс валюты остается слишком широким для Sprint 2, пока нет расхода. Поэтому Sprint 2 добавляет foundation story STORY-023 для каталога валют и provider adapter contract; она блокирует будущую STORY-012.
+**Planning Note:** STORY-009 first delivers independently testable base-currency expense creation. STORY-012 extends the same flow to cross-currency expenses and immutable rate snapshots. This sequencing prevents offline synchronization and base-currency recalculation from being built on an undefined expense contract.
 
 ## Sprint Backlog
 
-### Epic 5: Валюты и курсы (5 points)
+### Epic 4: Expenses and history (11 points)
 
-**Epic Goal:** Подготовить поддерживаемый валютный каталог, чтобы поездки и будущие расходы могли валидировать валюты одинаково на API и UI.
+**Epic Goal:** Participants can record an accepted expense and all trip members can inspect the shared financial history.
 
-#### STORY-023: Currency catalog foundation and provider contract
+#### STORY-009: Add a base-currency expense
 - **Priority:** Must Have
-- **Points:** 5
-- **Status:** Completed
-- **Dependencies:** STORY-020, STORY-021
-- **Brief:** Добавить каталог популярных валют Европы, СНГ, USD и EUR, API для списка валют и интерфейс adapter для будущего получения курсов.
+- **Points:** 8
+- **Status:** Not Started
+- **Dependencies:** STORY-004, STORY-007, STORY-023
+- **Brief:** Add the expense persistence model and authenticated creation endpoint with payer, exact amount, date, description, and member/family split targets.
+
+#### STORY-011: View all trip expenses
+- **Priority:** Should Have
+- **Points:** 3
+- **Status:** Not Started
+- **Dependencies:** STORY-009
+- **Brief:** Add a paginated expense history endpoint available to every active trip member and forbidden to outsiders.
 
 ---
 
-### Epic 2: Поездки и управление жизненным циклом (5 points)
+### Epic 5: Currencies and rates (8 points)
 
-**Epic Goal:** Owner может создать поездку и получить ссылку приглашения.
+**Epic Goal:** Cross-currency expenses retain a stable converted amount that does not change with later market rates.
 
-#### STORY-004: Create trip and invite link
+#### STORY-012: Automatic exchange rate and immutable snapshot
 - **Priority:** Must Have
-- **Points:** 5
-- **Status:** Completed
-- **Dependencies:** STORY-001, STORY-021, STORY-023
-- **Brief:** Реализовать `POST /api/v1/trips`, создание owner member и активного invite token без хранения raw token.
-
----
-
-### Epic 1: Доступ, аккаунты и гостевые сессии (5 points)
-
-**Epic Goal:** Приглашенный участник может войти в поездку без регистрации.
-
-#### STORY-002: Guest join by invite link
-- **Priority:** Must Have
-- **Points:** 5
-- **Status:** Completed
-- **Dependencies:** STORY-004
-- **Brief:** Реализовать `POST /api/v1/invites/{inviteToken}/join`, создание guest member и долговечной guest session.
-
----
-
-### Epic 3: Участники, семьи и доли (5 points)
-
-**Epic Goal:** Owner может завести семью как агрегированного участника с несколькими персональными долями.
-
-#### STORY-007: Create family with share count
-- **Priority:** Must Have
-- **Points:** 5
-- **Status:** Completed
-- **Dependencies:** STORY-004
-- **Brief:** Реализовать family aggregate в поездке, validate `shareCount > 0`, отображение семьи в участниках и основу для будущих расчетов.
+- **Points:** 8
+- **Status:** Not Started
+- **Dependencies:** STORY-009, STORY-023
+- **Brief:** Resolve the historical rate for the expense date, calculate the base-currency amount, and persist provider/source/rate metadata atomically with the expense.
 
 ## Story Prioritization
 
 ### Must Have
 
-1. STORY-023 - Currency catalog foundation and provider contract (5 points)
-2. STORY-004 - Create trip and invite link (5 points)
-3. STORY-002 - Guest join by invite link (5 points)
-4. STORY-007 - Create family with share count (5 points)
+1. STORY-009 - Add a base-currency expense (8 points)
+2. STORY-012 - Automatic exchange rate and immutable snapshot (8 points)
 
-**Total Must Have:** 20 points
+**Total Must Have:** 16 points
+
+### Should Have
+
+1. STORY-011 - View all trip expenses (3 points)
+
+**Total Should Have:** 3 points
 
 ### Deferred From Candidate Backlog
 
-- STORY-005 - Редактирование базовой валюты: deferred, потому что сначала нужен stable trip creation and currency catalog.
-- STORY-012 - Автоматический курс валюты: deferred, потому что полный rate snapshot имеет смысл после expense creation foundation.
-- STORY-016 - Offline expense creation: deferred до появления online expense model.
+- STORY-005 - Edit trip base currency: deferred until canonical expense and rate snapshot behavior exists.
+- STORY-006 - Archive and delete trip: valuable but outside the Sprint 3 expense goal.
+- STORY-016 - Offline expense creation: deferred until the online mutation and idempotency contract is proven.
+- STORY-013 - Manual exchange-rate override: provider failure returns an explicit manual-rate-required response in Sprint 3; editing and audit history remain a later story.
 
 ## Implementation Order
 
-1. **Days 1-2:** STORY-023 - Currency catalog foundation and provider contract
-   - Rationale: trip base currency needs server-side validation before trip creation becomes reliable.
+1. **Days 1-4:** STORY-009 - Add a base-currency expense
+   - Rationale: establishes the canonical expense, split, authorization, transaction, and idempotency contract.
 
-2. **Days 3-5:** STORY-004 - Create trip and invite link
-   - Rationale: guest join, family creation and expense work depend on a real trip.
+2. **Days 5-8:** STORY-012 - Automatic exchange rate and immutable snapshot
+   - Rationale: extends the proven creation path to cross-currency data while keeping snapshot persistence atomic.
 
-3. **Days 6-7:** STORY-002 - Guest join by invite link
-   - Rationale: validates public invite flow and guest session separation from invite token.
+3. **Day 9:** STORY-011 - View all trip expenses
+   - Rationale: exposes the stored expense and snapshot data to every trip member after the write model is stable.
 
-4. **Days 8-10:** STORY-007 - Create family with share count
-   - Rationale: introduces the family/share-count model needed before split calculations.
+4. **Day 10:** Integration hardening and contingency
+   - Rationale: reserve time for migration verification, decimal edge cases, provider failure behavior, and complete end-to-end regression.
 
 ## Story Dependencies
 
 ```text
-STORY-020 Project scaffold
-  └─> STORY-021 Core persistence
-        ├─> STORY-023 Currency catalog
-        │     └─> STORY-004 Create trip and invite link
-        │           ├─> STORY-002 Guest join by invite link
-        │           └─> STORY-007 Create family with share count
-        └─> STORY-001 Registered owner account creation
-              └─> STORY-004 Create trip and invite link
+STORY-004 Create trip and invite link
+  ├─> STORY-007 Create family with share count
+  └─> STORY-009 Add a base-currency expense
+        ├─> STORY-012 Automatic exchange rate and immutable snapshot
+        └─> STORY-011 View all trip expenses
+
+STORY-023 Currency catalog and provider contract
+  ├─> STORY-009 Add a base-currency expense
+  └─> STORY-012 Automatic exchange rate and immutable snapshot
 ```
+
+**Critical Path:** STORY-009 -> STORY-012.
 
 ## Risks and Mitigation
 
-### Risk 1: Currency provider scope expands into full expense conversion
-- **Probability:** Medium
-- **Impact:** Medium
-- **Mitigation:** Keep STORY-023 limited to supported currency catalog, validation and provider adapter contract. No expense snapshots in Sprint 2.
-
-### Risk 2: Invite flow mixes invite token and participant session token
+### Risk 1: Decimal money values lose precision
 - **Probability:** Medium
 - **Impact:** High
-- **Mitigation:** Store only token hashes and issue a separate guest session token after join.
+- **Mitigation:** Persist amounts and rates as PostgreSQL `numeric`, exchange decimal strings at the API boundary, and avoid JavaScript floating-point arithmetic.
+- **Contingency:** Block completion until high-precision and boundary-value integration tests pass.
 
-### Risk 3: Family model becomes too detailed too early
+### Risk 2: Currency provider failure leaves partial expenses
+- **Probability:** Medium
+- **Impact:** High
+- **Mitigation:** Resolve the rate before the write transaction and persist expense, splits, snapshot, and audit event atomically.
+- **Contingency:** Return a structured `manual_rate_required` error and create no expense.
+
+### Risk 3: Split targets reference another trip or inactive entities
+- **Probability:** Medium
+- **Impact:** High
+- **Mitigation:** Validate payer and every member/family target against the active trip inside the service layer and cover authorization with integration tests.
+- **Contingency:** Reject the whole request without partial rows.
+
+### Risk 4: STORY-009 expands into balance calculation
 - **Probability:** Medium
 - **Impact:** Medium
-- **Mitigation:** Sprint 2 supports aggregate family with `shareCount`; individual family members and balance breakdown remain later stories.
+- **Mitigation:** Persist validated split weights only. Balance calculation, family allocation, and settlement remain in EPIC-006.
+- **Contingency:** Move calculation work back to the backlog if discovered during implementation.
 
 ## Sprint Milestones
 
-- **Day 2:** Currency catalog API and validation foundation complete.
-- **Day 5:** Owner can create trip and receive invite link.
-- **Day 7:** Guest can join trip by invite link and receives a durable session.
-- **Day 10:** Owner can create family aggregate with share count.
+- **Day 4:** Base-currency expense creation and split persistence pass integration tests.
+- **Day 8:** Cross-currency expense stores an immutable rate snapshot and provider failures are atomic.
+- **Day 9:** Every active trip member can list shared expenses; outsiders are rejected.
+- **Day 10:** Full migration, API, authorization, decimal, and regression suites pass.
 
 ## Definition of Done
 
 A story is complete when:
 - [ ] All acceptance criteria are met.
-- [ ] Unit tests are written for new domain logic.
-- [ ] Integration tests cover API/database flows.
-- [ ] Access control is tested for owner-only and public endpoints.
-- [ ] Lint/typecheck/test/build pass locally.
-- [ ] Story file status can be moved to Completed.
+- [ ] Unit tests cover decimal, validation, and conversion domain logic.
+- [ ] Integration tests cover API, PostgreSQL transaction, and authorization paths.
+- [ ] Migration up/down behavior is verified.
+- [ ] Structured error codes are stable and documented in the story.
+- [ ] Lint, typecheck, test, and build pass locally.
+- [ ] Story status can be moved to Completed.
 
 ## Burndown Tracking
 
 | Date | Completed | Remaining | Ideal Remaining | Notes |
 |------|-----------|-----------|-----------------|-------|
-| 2026-06-30 | 20 | 0 | 20 | Sprint 2 implemented |
-| 2026-07-02 | To update | To update | 16 | Target: STORY-023 complete |
-| 2026-07-06 | To update | To update | 10 | Target: STORY-004 complete |
-| 2026-07-09 | To update | To update | 5 | Target: STORY-002 complete |
-| 2026-07-13 | To update | To update | 0 | Target: STORY-007 complete |
+| 2026-07-14 | 0 | 19 | 19 | Sprint begins |
+| 2026-07-17 | - | - | 13 | Target: STORY-009 complete |
+| 2026-07-22 | - | - | 6 | Target: STORY-012 complete |
+| 2026-07-24 | - | - | 2 | Target: STORY-011 complete |
+| 2026-07-27 | - | - | 0 | Sprint end and hardening complete |
 
 ## Next Sprint Candidate Backlog
 
-1. STORY-005 - Редактирование базовой валюты.
-2. STORY-006 - Архивирование и удаление поездки.
-3. STORY-009 - Добавление расхода.
-4. STORY-012 - Автоматический курс валюты and snapshot.
-5. STORY-016 - Добавление расхода offline.
+1. STORY-016 - Offline expense creation using the Sprint 3 mutation contract.
+2. STORY-005 - Edit trip base currency and recalculate display values from canonical snapshots.
+3. STORY-013 - Manual exchange-rate override with audit history.
+4. STORY-006 - Archive and delete trip.
+5. STORY-010 - Expense editing permissions.
 
 ## Notes
 
-- Sprint 2 intentionally starts with currency catalog foundation because trip creation requires base currency validation.
-- Guest join is STORY-002 according to PRD. Previous backlog wording that mapped guest join to STORY-005 is corrected in sprint status.
-- Full automatic rate conversion remains out of Sprint 2 scope.
+- Sprint 3 deliberately commits 19 of 20 points; the remaining point is contingency, not hidden scope.
+- STORY-009 is a thin vertical slice for base-currency expenses. Cross-currency support is accepted only through STORY-012.
+- Expense creation should accept an idempotency key now so STORY-016 can reuse the online mutation contract.
+- Balance calculation and family aggregation are not part of this sprint.
