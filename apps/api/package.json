@@ -1,0 +1,29 @@
+{
+  "name": "@owebee/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter @owebee/config build && tsx watch src/server.ts",
+    "build": "pnpm --filter @owebee/config build && tsc -p tsconfig.json",
+    "db:migrate": "tsx src/database/migrate.ts",
+    "start": "node dist/server.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "pnpm --filter @owebee/config build && vitest run"
+  },
+  "dependencies": {
+    "@owebee/config": "workspace:*",
+    "fastify": "^5.5.0",
+    "ioredis": "^5.7.0",
+    "pg": "^8.16.3",
+    "zod": "^4.0.17"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.3.14",
+    "@types/node": "^24.2.1",
+    "@types/pg": "^8.15.5",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

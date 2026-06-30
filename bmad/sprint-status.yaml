@@ -1,0 +1,366 @@
+project: Owebee
+project_level: 3
+current_sprint: 2
+
+sprint_config:
+  duration_weeks: 2
+  team_size: 1
+  points_per_dev_day: 2.5
+
+velocity_history:
+  - sprint: 1
+    planned: 20
+    completed: 20
+    completion_rate: 100
+    notes: "Initial foundation sprint completed."
+
+velocity_metrics:
+  three_sprint_average: 20
+  trend: "baseline_established"
+  recommended_capacity: 20
+
+sprints:
+  - number: 1
+    status: "completed"
+    start_date: "2026-07-01"
+    end_date: "2026-07-14"
+    sprint_goal: "Создать исполняемый технический фундамент Owebee и закрыть ранние риски по persistence, auth и offline sync."
+    capacity: 20
+
+    capacity_breakdown:
+      base_capacity: 25
+      adjustments:
+        - reason: "New project setup and unknowns (-20%)"
+          impact: -5
+      final_capacity: 20
+
+    stories:
+      - id: "STORY-020"
+        title: "Project scaffold, local dev environment and quality pipeline"
+        epic: "Technical Foundation"
+        priority: "Must Have"
+        points: 5
+        status: "completed"
+        started_date: "2026-06-30"
+        completed_date: "2026-06-30"
+        dependencies: []
+        blocked_by: null
+        notes: "Enabler story added for implementation readiness."
+
+      - id: "STORY-021"
+        title: "Core persistence baseline and migrations"
+        epic: "Technical Foundation"
+        priority: "Must Have"
+        points: 5
+        status: "completed"
+        started_date: "2026-06-30"
+        completed_date: "2026-06-30"
+        dependencies: ["STORY-020"]
+        blocked_by: null
+        notes: "Defines first PostgreSQL schema baseline."
+
+      - id: "STORY-001"
+        title: "Registered owner account creation"
+        epic: "EPIC-001"
+        priority: "Must Have"
+        points: 5
+        status: "completed"
+        started_date: "2026-06-30"
+        completed_date: "2026-06-30"
+        dependencies: ["STORY-020", "STORY-021"]
+        blocked_by: null
+        notes: "Refines PRD STORY-001 for Sprint 1."
+
+      - id: "STORY-022"
+        title: "Offline sync spike and mutation contract"
+        epic: "EPIC-007"
+        priority: "Must Have"
+        points: 5
+        status: "completed"
+        started_date: "2026-06-30"
+        completed_date: "2026-06-30"
+        dependencies: ["STORY-020", "STORY-021"]
+        blocked_by: null
+        notes: "Risk-reduction spike for FR-018/NFR-006."
+
+    metrics:
+      total_stories: 4
+      total_points: 20
+      completed_stories: 4
+      completed_points: 20
+      in_progress_stories: 0
+      in_progress_points: 0
+      remaining_stories: 0
+      remaining_points: 0
+      completion_percentage: 100
+
+    burndown:
+      - date: "2026-07-01"
+        completed_points: 20
+        remaining_points: 0
+        ideal_remaining: 20
+        notes: "Sprint 1 scope completed ahead of planned sprint start"
+      - date: "2026-07-03"
+        completed_points: null
+        remaining_points: null
+        ideal_remaining: 16
+        notes: "Target: STORY-020 complete"
+      - date: "2026-07-07"
+        completed_points: null
+        remaining_points: null
+        ideal_remaining: 10
+        notes: "Target: STORY-021 complete"
+      - date: "2026-07-10"
+        completed_points: null
+        remaining_points: null
+        ideal_remaining: 4
+        notes: "Target: STORY-001 complete"
+      - date: "2026-07-14"
+        completed_points: null
+        remaining_points: null
+        ideal_remaining: 0
+        notes: "Sprint end"
+
+    risks:
+      - description: "Offline sync spike expands beyond timebox"
+        impact: "high"
+        status: "active"
+        mitigation: "Limit to no-op/test mutation and documented contract."
+      - description: "Infrastructure setup consumes too much sprint capacity"
+        impact: "medium"
+        status: "active"
+        mitigation: "Keep STORY-020 scoped to local runnable baseline and CI checks."
+
+    blockers:
+      - story_id: null
+        description: "No active blockers"
+        reported_date: null
+        resolved_date: null
+
+    health:
+      velocity_on_track: true
+      burndown_on_track: true
+      blockers_count: 0
+      risks_count: 2
+      team_morale: "high"
+      notes: "Sprint 1 scope completed; Colima/Docker live smoke passed for PostgreSQL, Redis, migrations, auth and sync."
+
+  - number: 2
+    status: "planned"
+    start_date: "2026-06-30"
+    end_date: "2026-07-13"
+    sprint_goal: "Создать первый продуктовый контур поездки: каталог валют, создание поездки с invite link, гостевой вход и семейная группа."
+    capacity: 20
+
+    capacity_breakdown:
+      base_capacity: 20
+      adjustments:
+        - reason: "Use Sprint 1 completed velocity as Sprint 2 baseline"
+          impact: 0
+      final_capacity: 20
+
+    stories:
+      - id: "STORY-023"
+        title: "Currency catalog foundation and provider contract"
+        epic: "EPIC-005"
+        priority: "Must Have"
+        points: 5
+        status: "not_started"
+        started_date: null
+        completed_date: null
+        dependencies: ["STORY-020", "STORY-021"]
+        blocked_by: null
+        notes: "Foundation split from STORY-012 to keep automatic rate conversion out of Sprint 2."
+
+      - id: "STORY-004"
+        title: "Create trip and invite link"
+        epic: "EPIC-002"
+        priority: "Must Have"
+        points: 5
+        status: "not_started"
+        started_date: null
+        completed_date: null
+        dependencies: ["STORY-001", "STORY-021", "STORY-023"]
+        blocked_by: null
+        notes: "Creates trip, owner member and active invite token."
+
+      - id: "STORY-002"
+        title: "Guest join by invite link"
+        epic: "EPIC-001"
+        priority: "Must Have"
+        points: 5
+        status: "not_started"
+        started_date: null
+        completed_date: null
+        dependencies: ["STORY-004"]
+        blocked_by: null
+        notes: "Correct PRD mapping for guest join; STORY-005 remains base currency editing."
+
+      - id: "STORY-007"
+        title: "Create family with share count"
+        epic: "EPIC-003"
+        priority: "Must Have"
+        points: 5
+        status: "not_started"
+        started_date: null
+        completed_date: null
+        dependencies: ["STORY-004"]
+        blocked_by: null
+        notes: "Creates aggregate family model for later split calculations."
+
+    metrics:
+      total_stories: 4
+      total_points: 20
+      completed_stories: 0
+      completed_points: 0
+      in_progress_stories: 0
+      in_progress_points: 0
+      remaining_stories: 4
+      remaining_points: 20
+      completion_percentage: 0
+
+    burndown:
+      - date: "2026-06-30"
+        completed_points: 0
+        remaining_points: 20
+        ideal_remaining: 20
+        notes: "Sprint 2 planned"
+      - date: "2026-07-02"
+        completed_points: null
+        remaining_points: null
+        ideal_remaining: 16
+        notes: "Target: STORY-023 complete"
+      - date: "2026-07-06"
+        completed_points: null
+        remaining_points: null
+        ideal_remaining: 10
+        notes: "Target: STORY-004 complete"
+      - date: "2026-07-09"
+        completed_points: null
+        remaining_points: null
+        ideal_remaining: 5
+        notes: "Target: STORY-002 complete"
+      - date: "2026-07-13"
+        completed_points: null
+        remaining_points: null
+        ideal_remaining: 0
+        notes: "Target: STORY-007 complete"
+
+    risks:
+      - description: "Currency provider scope expands into full expense conversion"
+        impact: "medium"
+        status: "active"
+        mitigation: "Keep STORY-023 limited to catalog, validation and adapter contract."
+      - description: "Invite token and guest session token responsibilities get mixed"
+        impact: "high"
+        status: "active"
+        mitigation: "Store only hashes and issue a separate guest session token after join."
+      - description: "Family model becomes too detailed before expense splitting"
+        impact: "medium"
+        status: "active"
+        mitigation: "Support aggregate family plus share count only; defer individual family members."
+
+    blockers:
+      - story_id: null
+        description: "No active blockers"
+        reported_date: null
+        resolved_date: null
+
+    health:
+      velocity_on_track: true
+      burndown_on_track: true
+      blockers_count: 0
+      risks_count: 3
+      team_morale: "high"
+      notes: "Sprint 2 planned at 20 points using Sprint 1 velocity baseline."
+
+backlog:
+  - id: "STORY-005"
+    title: "Edit trip base currency"
+    epic: "EPIC-002"
+    priority: "Must Have"
+    points: 8
+    status: "not_started"
+    sprint_planned: 3
+  - id: "STORY-006"
+    title: "Archive and delete trip"
+    epic: "EPIC-002"
+    priority: "Must Have"
+    points: 5
+    status: "not_started"
+    sprint_planned: 3
+  - id: "STORY-012"
+    title: "Automatic currency rate and snapshot"
+    epic: "EPIC-005"
+    priority: "Must Have"
+    points: 8
+    status: "not_started"
+    sprint_planned: 3
+  - id: "STORY-016"
+    title: "Offline expense creation"
+    epic: "EPIC-007"
+    priority: "Must Have"
+    points: 8
+    status: "not_started"
+    sprint_planned: 3
+
+epics:
+  - name: "Technical Foundation"
+    total_stories: 3
+    total_points: 15
+    completed_stories: 2
+    completed_points: 10
+    progress_percentage: 66.7
+    target_sprint: 1
+  - name: "EPIC-001"
+    total_stories: 3
+    total_points: 15
+    completed_stories: 1
+    completed_points: 5
+    progress_percentage: 33.3
+    target_sprint: 2
+  - name: "EPIC-002"
+    total_stories: 3
+    total_points: 18
+    completed_stories: 0
+    completed_points: 0
+    progress_percentage: 0
+    target_sprint: 2
+  - name: "EPIC-003"
+    total_stories: 2
+    total_points: 10
+    completed_stories: 0
+    completed_points: 0
+    progress_percentage: 0
+    target_sprint: 2
+  - name: "EPIC-005"
+    total_stories: 3
+    total_points: 21
+    completed_stories: 0
+    completed_points: 0
+    progress_percentage: 0
+    target_sprint: 2
+  - name: "EPIC-007"
+    total_stories: 3
+    total_points: 26
+    completed_stories: 1
+    completed_points: 5
+    progress_percentage: 19.2
+    target_sprint: 1
+
+project_progress:
+  total_epics: 9
+  completed_epics: 0
+  total_stories: 23
+  completed_stories: 4
+  total_points: 142
+  completed_points: 20
+  progress_percentage: 14.1
+  sprints_completed: 1
+  sprints_remaining: 6
+  estimated_completion_date: "2026-09-22"
+
+retrospectives: []
+
+last_updated: "2026-06-30 16:20:00"
+updated_by: "scrum-master"
