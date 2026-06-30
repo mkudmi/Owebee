@@ -4,7 +4,7 @@
 - **Epic:** EPIC-005 - Currencies and rates
 - **Priority:** Must Have
 - **Story Points:** 8
-- **Status:** Not Started
+- **Status:** Completed
 
 ## User Story
 
@@ -14,12 +14,12 @@ So that **the system preserves a stable converted amount for balances and histor
 
 ## Acceptance Criteria
 
-- [ ] When expense currency differs from trip base currency, creation resolves a historical rate for the expense date through `CurrencyRateProvider`.
-- [ ] The conversion convention is explicit and tested: `convertedAmount = originalAmount * rate`, where rate is units of trip base currency per one unit of expense currency.
-- [ ] Expense creation stores original amount/currency, base currency, exact rate, converted amount, rate date, provider source, and `manual=false` in an immutable snapshot.
-- [ ] A later provider-rate change does not mutate an existing expense snapshot or converted amount.
-- [ ] Same-currency creation continues to use rate `1` and source `same_currency` without calling the provider.
-- [ ] Unsupported currency, invalid provider response, or unavailable rate returns a structured error and creates no expense, split, snapshot, idempotency, or audit rows.
+- [x] When expense currency differs from trip base currency, creation resolves a historical rate for the expense date through `CurrencyRateProvider`.
+- [x] The conversion convention is explicit and tested: `convertedAmount = originalAmount * rate`, where rate is units of trip base currency per one unit of expense currency.
+- [x] Expense creation stores original amount/currency, base currency, exact rate, converted amount, rate date, provider source, and `manual=false` in an immutable snapshot.
+- [x] A later provider-rate change does not mutate an existing expense snapshot or converted amount.
+- [x] Same-currency creation continues to use rate `1` and source `same_currency` without calling the provider.
+- [x] Unsupported currency, invalid provider response, or unavailable rate returns a structured error and creates no expense, split, snapshot, idempotency, or audit rows.
 
 ## Technical Notes
 
@@ -134,18 +134,18 @@ Provider failure:
 
 ### Unit Tests
 
-- [ ] Correct rate direction and `amount * rate` conversion.
-- [ ] Exact decimal behavior for high precision and trailing zeros.
-- [ ] Same-currency flow skips the provider.
-- [ ] Invalid, unavailable, and mismatched provider results are rejected.
-- [ ] Existing snapshot remains unchanged after provider data changes.
+- [x] Correct rate direction and `amount * rate` conversion.
+- [x] Exact decimal behavior for high precision and trailing zeros.
+- [x] Same-currency flow skips the provider.
+- [x] Invalid, unavailable, and mismatched provider results are rejected.
+- [x] Existing snapshot remains unchanged after provider data changes.
 
 ### Integration Tests
 
-- [ ] Cross-currency expense persists one immutable snapshot and converted amount.
-- [ ] Provider failure leaves all expense-related tables unchanged.
-- [ ] Unsupported currency is rejected before provider lookup.
-- [ ] Repeated idempotent request reuses the original snapshot.
+- [x] Cross-currency expense persists one immutable snapshot and converted amount.
+- [x] Provider failure leaves all expense-related tables unchanged.
+- [x] Unsupported currency is rejected before provider lookup.
+- [x] Repeated idempotent request reuses the original snapshot.
 
 ### Manual Testing
 
@@ -154,9 +154,15 @@ Provider failure:
 
 ## Definition of Done
 
-- [ ] All acceptance criteria are met.
-- [ ] Conversion convention is documented and tested.
-- [ ] Decimal-safe calculations and provider failures are covered.
-- [ ] Integration tests prove atomic persistence and snapshot immutability.
-- [ ] Lint, typecheck, test, and build pass.
-- [ ] Story status can be moved to Completed.
+- [x] All acceptance criteria are met.
+- [x] Conversion convention is documented and tested.
+- [x] Decimal-safe calculations and provider failures are covered.
+- [x] Integration tests prove atomic persistence and snapshot immutability.
+- [x] Lint, typecheck, test, and build pass.
+- [x] Story status can be moved to Completed.
+
+## Implementation Notes
+
+- Provider results are validated as untrusted data and normalized to expense-currency → base-currency direction.
+- Snapshot values are written atomically with the expense and are reused unchanged by idempotent replay.
+- Production rates come from the Bank of Russia `DailyInfo` SOAP service (`GetCursOnDateXML`). `VunitRate` is used for RUB rates; non-RUB cross-rates are derived through RUB with deterministic decimal arithmetic.

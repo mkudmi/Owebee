@@ -4,7 +4,7 @@
 - **Epic:** EPIC-004 - Expenses and history
 - **Priority:** Must Have
 - **Story Points:** 8
-- **Status:** Not Started
+- **Status:** Completed
 
 ## User Story
 
@@ -14,12 +14,12 @@ So that **the trip has a durable, calculation-ready record of what was paid**
 
 ## Acceptance Criteria
 
-- [ ] An active owner or guest member can create an expense in an active trip using the trip base currency.
-- [ ] The request accepts an exact positive decimal amount, expense date, description, active payer, and one or more unique active member/family split targets from the same trip.
-- [ ] A base-currency expense stores `originalAmount`, `convertedAmount`, and rate as decimal values with rate `1`, without forced rounding at the API boundary.
-- [ ] Expense, split rows, same-currency snapshot, idempotency record, and audit event are committed atomically with status `accepted`.
-- [ ] Repeating the same `Idempotency-Key` for the same actor and trip returns the original result without duplicate rows.
-- [ ] Invalid targets, mixed-trip references, inactive entities, archived/deleted trips, outsiders, and unauthenticated requests are rejected with structured errors and no partial write.
+- [x] An active owner or guest member can create an expense in an active trip using the trip base currency.
+- [x] The request accepts an exact positive decimal amount, expense date, description, active payer, and one or more unique active member/family split targets from the same trip.
+- [x] A base-currency expense stores `originalAmount`, `convertedAmount`, and rate as decimal values with rate `1`, without forced rounding at the API boundary.
+- [x] Expense, split rows, same-currency snapshot, idempotency record, and audit event are committed atomically with status `accepted`.
+- [x] Repeating the same `Idempotency-Key` for the same actor and trip returns the original result without duplicate rows.
+- [x] Invalid targets, mixed-trip references, inactive entities, archived/deleted trips, outsiders, and unauthenticated requests are rejected with structured errors and no partial write.
 
 ## Technical Notes
 
@@ -130,19 +130,19 @@ Response:
 
 ### Unit Tests
 
-- [ ] Decimal amount and date validation.
-- [ ] Duplicate and malformed split target validation.
-- [ ] Idempotency fingerprint comparison.
-- [ ] Base-currency snapshot mapping with rate `1`.
+- [x] Decimal amount and date validation.
+- [x] Duplicate and malformed split target validation.
+- [x] Idempotency fingerprint comparison.
+- [x] Base-currency snapshot mapping with rate `1`.
 
 ### Integration Tests
 
-- [ ] Owner creates a valid expense with member and family targets.
-- [ ] Guest creates an expense and can select another active payer.
-- [ ] Duplicate idempotency request returns one expense.
-- [ ] Same key with changed payload returns conflict.
-- [ ] Outsider, inactive entity, mixed-trip target, and archived trip are rejected.
-- [ ] Transaction failure leaves no expense, split, snapshot, idempotency, or audit rows.
+- [x] Owner creates a valid expense with member and family targets.
+- [x] Guest creates an expense and can select another active payer.
+- [x] Duplicate idempotency request returns one expense.
+- [x] Same key with changed payload returns conflict.
+- [x] Outsider, inactive entity, mixed-trip target, and archived trip are rejected.
+- [x] Transaction/provider failure leaves no expense, split, snapshot, idempotency, or audit rows.
 
 ### Manual Testing
 
@@ -151,9 +151,15 @@ Response:
 
 ## Definition of Done
 
-- [ ] All acceptance criteria are met.
-- [ ] Migration up/down and constraints are verified.
-- [ ] Unit and integration tests pass.
-- [ ] Access control and idempotency are covered by tests.
-- [ ] Lint, typecheck, and build pass.
-- [ ] Story status can be moved to Completed.
+- [x] All acceptance criteria are met.
+- [x] Migration up/down and constraints are verified.
+- [x] Unit and integration tests pass.
+- [x] Access control and idempotency are covered by tests.
+- [x] Lint, typecheck, and build pass.
+- [x] Story status can be moved to Completed.
+
+## Implementation Notes
+
+- Implemented in migration `0004_sprint3_expenses.sql` and the API `expenses` module.
+- Durable idempotency is scoped by trip and actor member; only the key hash is stored.
+- Exact decimal strings are persisted as PostgreSQL `numeric`; conversion avoids JavaScript floating-point arithmetic.

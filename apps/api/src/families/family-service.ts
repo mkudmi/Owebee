@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
+import type { TripActor } from "../auth/trip-actor.js";
 import { runInTransaction, type Database } from "../database/database.js";
 import { isUniqueConstraintError } from "../trips/trip-service.js";
 
@@ -10,10 +11,6 @@ const createFamilySchema = z.object({
     .trim()
     .regex(/^(?:0*[1-9]\d*)(?:\.\d+)?$|^0*\.\d*[1-9]\d*$/)
 });
-
-export type TripActor =
-  | { type: "registered"; userId: string }
-  | { type: "guest"; memberId: string; tripId: string };
 
 export interface FamilyDto {
   id: string;

@@ -4,7 +4,7 @@
 - **Epic:** EPIC-004 - Expenses and history
 - **Priority:** Should Have
 - **Story Points:** 3
-- **Status:** Not Started
+- **Status:** Completed
 
 ## User Story
 
@@ -14,11 +14,11 @@ So that **everyone in the trip sees the same financial records**
 
 ## Acceptance Criteria
 
-- [ ] Any active owner or guest member can list all accepted expenses for their trip.
-- [ ] Each item includes payer, creator, original and converted amounts, currencies, expense date, description, rate snapshot summary, and split target summary.
-- [ ] Results are ordered by expense date descending and then creation time/id descending with deterministic cursor pagination.
-- [ ] An archived trip remains readable to its members; a deleted trip, outsider, inactive member, or unauthenticated caller cannot access the list.
-- [ ] The response uses decimal strings and does not recalculate or replace stored converted amounts.
+- [x] Any active owner or guest member can list all accepted expenses for their trip.
+- [x] Each item includes payer, creator, original and converted amounts, currencies, expense date, description, rate snapshot summary, and split target summary.
+- [x] Results are ordered by expense date descending and then creation time/id descending with deterministic cursor pagination.
+- [x] An archived trip remains readable to its members; a deleted trip, outsider, inactive member, or unauthenticated caller cannot access the list.
+- [x] The response uses decimal strings and does not recalculate or replace stored converted amounts.
 
 ## Technical Notes
 
@@ -98,17 +98,17 @@ Response:
 
 ### Unit Tests
 
-- [ ] Cursor encode/decode and validation.
-- [ ] Stable ordering for equal dates and timestamps.
-- [ ] Limit boundaries and default.
+- [x] Cursor encode/decode and validation.
+- [x] Stable ordering for equal dates and timestamps.
+- [x] Limit boundaries and default.
 
 ### Integration Tests
 
-- [ ] Owner and guest see the same trip expense history.
-- [ ] Results contain persisted snapshot and split summaries.
-- [ ] Pagination has no duplicates or omissions.
-- [ ] Outsider, inactive member, and unauthenticated caller are rejected.
-- [ ] Archived trip is readable and deleted trip is not.
+- [x] Owner and guest see the same trip expense history.
+- [x] Results contain persisted snapshot and split summaries.
+- [x] Pagination has no duplicates or omissions.
+- [x] Outsider, inactive member, and unauthenticated caller are rejected.
+- [x] Archived trip is readable and deleted trip is not.
 
 ### Manual Testing
 
@@ -116,9 +116,14 @@ Response:
 
 ## Definition of Done
 
-- [ ] All acceptance criteria are met.
-- [ ] Query is deterministic and avoids N+1 database access.
-- [ ] Authorization and archived-trip behavior are covered.
-- [ ] Unit and integration tests pass.
-- [ ] Lint, typecheck, and build pass.
-- [ ] Story status can be moved to Completed.
+- [x] All acceptance criteria are met.
+- [x] Query is deterministic and avoids N+1 database access.
+- [x] Authorization and archived-trip behavior are covered.
+- [x] Unit and integration tests pass.
+- [x] Lint, typecheck, and build pass.
+- [x] Story status can be moved to Completed.
+
+## Implementation Notes
+
+- History uses the `(expense_date, created_at, id)` cursor and fetches split summaries in one page-level query.
+- Stored converted amounts and snapshot values are returned directly without recalculation.

@@ -6,7 +6,12 @@ const envSchema = z.object({
   API_PORT: z.coerce.number().int().positive().default(4000),
   WEB_BASE_URL: z.string().url().default("http://localhost:5173"),
   DATABASE_URL: z.string().url(),
-  REDIS_URL: z.string().url()
+  REDIS_URL: z.string().url(),
+  CBR_SOAP_URL: z
+    .string()
+    .url()
+    .default("https://www.cbr.ru/DailyInfoWebServ/DailyInfo.asmx"),
+  CBR_TIMEOUT_MS: z.coerce.number().int().positive().default(5000)
 });
 
 export type AppConfig = z.infer<typeof envSchema>;

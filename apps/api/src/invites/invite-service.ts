@@ -122,7 +122,7 @@ export class InviteService {
         where guest_sessions.session_hash = $1
           and guest_sessions.revoked_at is null
           and trip_members.status = 'active'
-          and trips.status = 'active'
+          and trips.status <> 'deleted'
         limit 1
       `,
       [sessionHash]

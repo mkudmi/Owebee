@@ -1,15 +1,15 @@
 import type { FastifyInstance } from "fastify";
 import { ZodError } from "zod";
-import { InvalidSessionError, type AuthService } from "../auth/auth-service.js";
-import { parseBearerToken, unauthorized } from "../http/bearer.js";
+import type { AuthService } from "../auth/auth-service.js";
+import { resolveTripActor } from "../auth/trip-actor.js";
+import { unauthorized } from "../http/bearer.js";
 import type { InviteService } from "../invites/invite-service.js";
 import {
   DuplicateFamilyNameError,
   ForbiddenTripActionError,
   TripNotActiveError,
   TripNotFoundError,
-  type FamilyService,
-  type TripActor
+  type FamilyService
 } from "./family-service.js";
 
 export interface FamilyRoutesOptions {
@@ -25,7 +25,7 @@ export async function registerFamilyRoutes(
   app.post<{ Params: { tripId: string } }>(
     "/api/v1/trips/:tripId/families",
     async (request, reply) => {
-      const actor = await resolveActor(request.headers.authorization, options);
+      const actor = await resolveTripActor(request.headers.authorization, options);
       if (!actor) {
         return unauthorized(reply);
       }
@@ -46,7 +46,7 @@ export async function registerFamilyRoutes(
   app.get<{ Params: { tripId: string } }>(
     "/api/v1/trips/:tripId/participants",
     async (request, reply) => {
-      const actor = await resolveActor(request.headers.authorization, options);
+      const actor = await resolveTripActor(request.headers.authorization, options);
       if (!actor) {
         return unauthorized(reply);
       }
@@ -61,30 +61,6 @@ export async function registerFamilyRoutes(
       }
     }
   );
-}
-
-async function resolveActor(
-  authorizationHeader: string | undefined,
-  options: Pick<FamilyRoutesOptions, "authService" | "inviteService">
-): Promise<TripActor | null> {
-  const token = parseBearerToken(authorizationHeader);
-  if (!token) {
-    return null;
-  }
-
-  try {
-    const user = await options.authService.getUserBySessionToken(token);
-    return { type: "registered", userId: user.id };
-  } catch (error) {
-    if (!(error instanceof InvalidSessionError)) {
-      throw error;
-    }
-  }
-
-  const guest = await options.inviteService.getGuestBySessionToken(token);
-  return guest
-    ? { type: "guest", memberId: guest.memberId, tripId: guest.tripId }
-    : null;
 }
 
 function handleFamilyError(

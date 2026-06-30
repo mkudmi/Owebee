@@ -32,7 +32,8 @@ describe("migrations", () => {
     expect(applied).toEqual([
       "0001_core_baseline",
       "0002_sync_mutations",
-      "0003_sprint2_trips_currency_invites_families"
+      "0003_sprint2_trips_currency_invites_families",
+      "0004_sprint3_expenses"
     ]);
 
     const tables = await db.query<{ table_name: string }>(`
@@ -48,6 +49,10 @@ describe("migrations", () => {
         "auth_sessions",
         "currencies",
         "families",
+        "expenses",
+        "expense_splits",
+        "currency_rate_snapshots",
+        "expense_idempotency_keys",
         "guest_sessions",
         "trip_invites",
         "trip_members",

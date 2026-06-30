@@ -33,6 +33,20 @@ export class CurrencyProviderUnavailableError extends Error {
   }
 }
 
+export class UnavailableCurrencyRateProvider implements CurrencyRateProvider {
+  readonly name = "unconfigured";
+
+  async getHistoricalRate(): Promise<ExchangeRateResult> {
+    throw new CurrencyProviderUnavailableError(this.name);
+  }
+}
+
+export class InvalidCurrencyProviderResponseError extends Error {
+  constructor() {
+    super("Currency provider returned invalid rate data");
+  }
+}
+
 export class FakeCurrencyRateProvider implements CurrencyRateProvider {
   readonly name = "fake";
 
@@ -97,8 +111,15 @@ export async function isActiveCurrencyCode(
   return result.rows.length > 0;
 }
 
+const positiveDecimalSchema = z.string().regex(/^(?:0*[1-9]\d*)(?:\.\d+)?$|^0*\.\d*[1-9]\d*$/);
+const isoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
 export class CurrencyService {
-  constructor(private readonly database: Database) {}
+  constructor(
+    private readonly database: Database,
+    private readonly rateProvider: CurrencyRateProvider =
+      new UnavailableCurrencyRateProvider()
+  ) {}
 
   async listActiveCurrencies(): Promise<CurrencyDto[]> {
     const result = await this.database.query<{
@@ -130,5 +151,39 @@ export class CurrencyService {
     }
 
     return code;
+  }
+
+  async resolveHistoricalRate(input: {
+    originalCurrencyCode: string;
+    baseCurrencyCode: string;
+    rateDate: string;
+  }): Promise<ExchangeRateResult> {
+    const originalCurrencyCode = await this.ensureActiveCurrencyCode(
+      input.originalCurrencyCode
+    );
+    const baseCurrencyCode = await this.ensureActiveCurrencyCode(input.baseCurrencyCode);
+    const result = await this.rateProvider.getHistoricalRate({
+      baseCurrencyCode: originalCurrencyCode,
+      targetCurrencyCode: baseCurrencyCode,
+      rateDate: input.rateDate
+    });
+
+    if (
+      normalizeCurrencyCode(result.baseCurrencyCode) !== originalCurrencyCode ||
+      normalizeCurrencyCode(result.targetCurrencyCode) !== baseCurrencyCode ||
+      !isoDateSchema.safeParse(result.rateDate).success ||
+      !positiveDecimalSchema.safeParse(result.rate).success ||
+      typeof result.source !== "string" ||
+      result.source.trim().length === 0
+    ) {
+      throw new InvalidCurrencyProviderResponseError();
+    }
+
+    return {
+      ...result,
+      baseCurrencyCode: originalCurrencyCode,
+      targetCurrencyCode: baseCurrencyCode,
+      source: result.source.trim()
+    };
   }
 }
