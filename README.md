@@ -54,7 +54,7 @@ pnpm check
 
 ## BMAD Artifacts
 
-Planning and story files live under:
+BMAD Method v6 stores generated artifacts under:
 
-- `docs/bmad/`
-- `docs/stories/`
+- `_bmad-output/planning-artifacts/`
+- `_bmad-output/implementation-artifacts/`
