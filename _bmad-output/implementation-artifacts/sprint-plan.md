@@ -1,173 +1,201 @@
-# Sprint Plan: Owebee
+# План Sprint 5: Owebee
 
-- **Sprint Number:** 4
-- **Sprint Dates:** 2026-07-28 - 2026-08-10
-- **Sprint Duration:** 2 weeks / 10 working days
-- **Created:** 2026-06-30
-- **Status:** Planned
+- **Номер спринта:** 5
+- **Горизонт исполнения:** 10 рабочих дней, старт сразу после подготовки первой story
+- **Создан:** 2026-07-01
+- **Статус:** Planned
 
-## Sprint Overview
+## Цель спринта
 
-**Sprint Goal:** Turn accepted expenses into an explainable, zero-sum trip balance: allocate member and family shares deterministically, expose the shared balance to every trip member, and provide per-expense breakdowns.
+Доставить первый рабочий пользовательский вертикальный срез Owebee: участник открывает responsive-интерфейс поездки, создаёт расход с телефона без сети, видит его в обычном списке со статусом ожидания и наблюдает безопасную синхронизацию после восстановления соединения.
 
-**Sprint Capacity:** 20 story points
-**Stories Planned:** 3 stories
-**Committed Story Points:** 18 points
+Sprint 5 является началом продуктовой UI-разработки. Статическая стартовая страница `apps/web` должна быть заменена функциональным интерфейсом на основе канонических `DESIGN.md` и `EXPERIENCE.md`.
 
-**Capacity Calculation:**
+## Ёмкость
 
-- Sprint 1 completed 20/20 points.
-- Sprint 2 completed 20/20 points.
-- Sprint 3 completed 19/19 points.
-- Three-sprint rolling average is 19.7 points; recommended capacity is 20.
-- Commit 18 points and retain 2 points for calculation precision, benchmark, and integration contingency.
+- Историческая скорость: 20, 20, 19 и 18 points.
+- Средняя скорость: 19,25 points.
+- Рекомендуемая ёмкость: 19 points.
+- Запланировано: 3 stories, 19 points.
+- Резерв внутри stories обеспечивается уже завершёнными `STORY-022`, sync API и базовым IndexedDB outbox.
 
-## Sprint Audit
+### Уточнение оценки STORY-017
 
-| Sprint | Planned | Completed | Result | Evidence |
-|---|---:|---:|---|---|
-| 1 | 20 | 20 | Completed | STORY-001, STORY-020, STORY-021, STORY-022 and passing foundation tests |
-| 2 | 20 | 20 | Completed | STORY-002, STORY-004, STORY-007, STORY-023 and Sprint 2 API tests |
-| 3 | 19 | 19 | Completed | STORY-009, STORY-011, STORY-012, migration 0004 and Sprint 3 API tests |
+Оценка PRD в 13 points отражала greenfield-реализацию. Для Sprint 5 используется уточнённая оценка 8 points, потому что уже готовы:
 
-Audit corrections:
+- серверный mutation contract и idempotency ledger (`STORY-022`);
+- `/api/v1/sync/*` и автоматические тесты;
+- базовый IndexedDB outbox и его unit tests;
+- online expense API и неизменяемые валютные snapshots.
 
-- Sprint 3 is recorded as completed in machine-readable status.
-- The completed Sprint 3 plan is archived as `_bmad-output/implementation-artifacts/sprint-plan-3.md`.
-- Sprint dates are planning windows; implementation has run ahead of the nominal calendar.
-- Sprint 2 story checklists contain historical documentation drift, but headers, code, tests, Git history, and sprint status consistently show completion.
+Оставшийся объём — клиентский replay, интеграция с expense mutation, UI-состояния и обработка ошибок.
 
-## Sprint Backlog
+## Backlog спринта
 
-### Epic 3: Participants, families and shares (5 points)
+### STORY-024: Каркас продуктового UI и workspace поездки — 3 points
 
-#### STORY-008: Family share allocation and breakdown
+- **Приоритет:** Must Have
+- **Статус:** Review
+- **Зависимости:** завершённые API stories Sprint 1–4
+- **Назначение:** открыть путь к пользовательским функциям, а не оставлять их за статической landing page.
 
-- **Priority:** Must Have
-- **Points:** 5
-- **Status:** Not Started
-- **Dependencies:** STORY-007, STORY-009
-- **Brief:** Add the pure, decimal-safe allocation contract that expands snapshotted member/family weights and preserves explanation records.
+Объём:
 
-### Epic 6: Balances and totals (13 points)
+- заменить placeholder в `apps/web` на responsive app shell;
+- применить токены и базовые компоненты из канонического UX-дизайна;
+- добавить маршрут workspace поездки и навигацию Overview / Expenses / Balance / People;
+- добавить API/session bootstrap, достаточный для работы expense-среза;
+- обеспечить рабочие состояния загрузки, пустого списка и ошибки;
+- проверить layout на 320px и 1440px.
 
-#### STORY-014: View trip balance
+Не входит: полный UI регистрации, гостевого восстановления и настроек поездки.
 
-- **Priority:** Must Have
-- **Points:** 8
-- **Status:** Not Started
-- **Dependencies:** STORY-008, STORY-009, STORY-011
-- **Brief:** Calculate payer credits and target liabilities from persisted converted amounts and expose an authorized, zero-sum trip balance.
+### STORY-016: Добавление расхода offline — 8 points
 
-#### STORY-015: Explain trip balance
+- **Приоритет:** Must Have
+- **Статус:** Not Started
+- **Зависимости:** `STORY-009`, `STORY-012`, `STORY-022`, `STORY-024`
 
-- **Priority:** Should Have
-- **Points:** 5
-- **Status:** Not Started
-- **Dependencies:** STORY-008, STORY-014
-- **Brief:** Expose a paginated per-expense explanation for any member or family balance line.
+Объём:
 
-## Prioritization
+- mobile-first форма расхода: сумма, валюта, дата, описание, плательщик и targets;
+- создание expense mutation с устойчивым `clientMutationId`;
+- durable persistence в IndexedDB до закрытия формы;
+- отображение локального расхода в обычном списке со статусом `pending`;
+- сохранение pending-расхода после перезапуска приложения;
+- защита от повторного нажатия и дублирования;
+- понятная ошибка storage failure без потери введённых данных.
 
-### Must Have — 13 points
+### STORY-017: Синхронизация после восстановления сети — 8 points
 
-1. STORY-008 — Family share allocation and breakdown (5)
-2. STORY-014 — View trip balance (8)
+- **Приоритет:** Must Have
+- **Статус:** Not Started
+- **Зависимости:** `STORY-016`, `STORY-022`
 
-### Should Have — 5 points
+Объём:
 
-1. STORY-015 — Explain trip balance (5)
+- replay pending-очереди при восстановлении сети и при безопасном ручном retry;
+- состояния `pending`, `syncing`, `synced`, `failed`, `conflict`;
+- идемпотентная отправка без дубликатов;
+- обновление той же строки расхода после успешной синхронизации;
+- persistent-индикаторы unresolved-состояний и базовый Sync Center;
+- conflict-состояние сохраняет локальный payload и показывает, что требуется внимание;
+- предупреждение, что pending/conflict расходы ещё не включены в серверный баланс.
 
-If capacity is threatened, STORY-015 is the first scope-release candidate; STORY-008 and STORY-014 together still achieve the core balance goal.
+## Приоритеты и правило снятия scope
 
-## Implementation Order
+Все три stories обязательны для цели спринта.
 
-1. **Days 1–3:** STORY-008
-   - Freeze decimal precision, residual, and explanation contracts before adding an API.
-2. **Days 4–7:** STORY-014
-   - Build the balance query and endpoint on the tested allocation core.
-3. **Days 8–9:** STORY-015
-   - Reuse calculation explanations for drill-down and pagination.
-4. **Day 10:** Hardening
-   - Run the 20-participant/300-expense benchmark, authorization regression, and full quality gates.
+Если ёмкость оказывается ниже ожидаемой:
 
-## Dependency Graph
+1. сохраняются `STORY-024` и `STORY-016`;
+2. из `STORY-017` переносится расширенное сравнение conflict-полей;
+3. нельзя переносить durable outbox, автоматический replay, защиту от дублей и видимый статус pending.
+
+## Порядок реализации
+
+1. **Дни 1–2 — STORY-024**
+   - app shell, trip workspace, дизайн-токены, API/session bootstrap;
+   - первый проверяемый UI доступен уже к концу второго дня.
+2. **Дни 3–5 — STORY-016**
+   - mobile expense form, локальная запись, список pending-расходов;
+   - к концу пятого дня доступен рабочий offline expense flow.
+3. **Дни 6–9 — STORY-017**
+   - replay, смена sync-состояний, retry/conflict и balance notice.
+4. **День 10 — hardening**
+   - responsive, accessibility, restart/reconnect, duplicate prevention, полный regression.
+
+## Критический путь
 
 ```text
-STORY-007 Create family ─┐
-STORY-009 Add expense ──┴─> STORY-008 Family allocation
-STORY-011 View history ─────> STORY-014 View balance
-STORY-008 ──────────────────> STORY-014 ──> STORY-015 Explain balance
+STORY-024 UI shell
+        ↓
+STORY-016 Offline expense + pending UI
+        ↓
+STORY-017 Replay + synced/conflict UI
 ```
 
-**Critical Path:** STORY-008 → STORY-014 → STORY-015.
+## UI-результат спринта
 
-## Risks and Mitigation
+К завершению Sprint 5 пользователь должен увидеть и использовать:
 
-### Repeating decimal allocation
+- responsive workspace поездки вместо placeholder-экрана;
+- мобильную форму добавления расхода;
+- список расходов с локальными и серверными строками;
+- понятные sync badges с текстом и иконкой;
+- offline/pending notice рядом с данными, которые ещё не учтены в балансе;
+- стабильное поведение при закрытии приложения и восстановлении сети.
 
-- **Probability:** High
-- **Impact:** High
-- **Mitigation:** Use rational/BigInt calculation, a documented output scale, deterministic residual assignment, and a zero-sum invariant.
-- **Contingency:** Complete STORY-008 before any endpoint work; do not duplicate allocation logic in routes.
+Это первый функциональный UI-срез, но ещё не полный MVP-интерфейс. Регистрация, guest join, создание поездки, полноценные balance screens, локализация и общая responsive-полировка остаются последующим UI backlog.
 
-### Historical family shares change
+## Риски и меры
 
-- **Probability:** Medium
-- **Impact:** High
-- **Mitigation:** Calculate from `expense_splits.share_count`, never the family's current mutable value.
-- **Contingency:** Add fixtures where one family has different snapshots across expenses.
+### Старые backend stories не имеют полного UI
 
-### N+1 queries or slow recalculation
+- **Вероятность:** высокая
+- **Влияние:** высокое
+- **Мера:** `STORY-024` создаёт общий frontend-каркас; после Sprint 5 необходимо выделить явные UI stories для уже готовых API capabilities.
 
-- **Probability:** Medium
-- **Impact:** Medium
-- **Mitigation:** Load bounded datasets in a fixed number of queries and benchmark the architecture target of 20 participants/300 expenses.
-- **Contingency:** Optimize indexes/query shape; do not introduce a canonical balance cache in this sprint.
+### Outbox поддерживает только `sync.test`
 
-### Breakdown diverges from summary
+- **Вероятность:** высокая
+- **Влияние:** высокое
+- **Мера:** сначала мигрировать типизированный payload на `expense.create`, сохранить обратную совместимость данных или выполнить версионированную IndexedDB migration.
 
-- **Probability:** Medium
-- **Impact:** High
-- **Mitigation:** Generate both from the same explanation records and assert reconciliation in automated tests.
-- **Contingency:** Defer STORY-015 rather than ship a second calculation path.
+### UI зависит от session/trip context
 
-## Milestones
+- **Вероятность:** средняя
+- **Влияние:** высокое
+- **Мера:** реализовать минимальный session bootstrap в `STORY-024`; не расширять Sprint 5 до полного auth UI.
 
-- **Day 3:** Allocation contract passes precision and family-share fixtures.
-- **Day 7:** Authorized zero-sum balance endpoint passes integration tests.
-- **Day 9:** Breakdown reconciles to every summary line.
-- **Day 10:** Benchmark and full regression gates pass.
+### Повторная синхронизация создаёт дубли
+
+- **Вероятность:** средняя
+- **Влияние:** критическое
+- **Мера:** один `clientMutationId` на локальный расход, серверная идемпотентность и integration test reconnect/retry.
+
+### Conflict UI разрастается в редактор слияния
+
+- **Вероятность:** средняя
+- **Влияние:** среднее
+- **Мера:** в Sprint 5 показать устойчивое `Needs attention`, сохранить payload и доступное сравнение; сложное merge-редактирование не входит.
+
+## Вехи
+
+- **День 2:** placeholder заменён responsive trip workspace.
+- **День 5:** расход сохраняется offline, переживает restart и виден как pending.
+- **День 8:** reconnect синхронизирует расход без дублей.
+- **День 9:** failed/conflict остаются видимыми и доступны для действия.
+- **День 10:** acceptance, responsive и regression gates пройдены.
 
 ## Definition of Done
 
-A story is complete when:
+- [ ] Все acceptance criteria story подтверждены тестами или воспроизводимыми evidence.
+- [ ] UI соответствует `DESIGN.md` и `EXPERIENCE.md`, а не временной стилизации.
+- [ ] Основной flow работает на 320px и 1440px.
+- [ ] Интерактивные targets имеют достаточный размер; status не передаётся только цветом.
+- [ ] Offline expense переживает reload/restart.
+- [ ] Reconnect и повторный retry не создают дубликаты.
+- [ ] Pending/conflict расход остаётся видимым и не выдаётся за учтённый в серверном балансе.
+- [ ] Unit, integration и frontend tests проходят.
+- [ ] Typecheck и production build проходят для web и API.
+- [ ] Story и sprint status обновлены.
 
-- [ ] All acceptance criteria are verified with evidence.
-- [ ] Calculation logic has at least 90% coverage and includes edge/error cases.
-- [ ] Authorization and archived/deleted behavior are integration-tested.
-- [ ] Query count is bounded and the representative benchmark passes.
-- [ ] Decimal strings are used at API boundaries; JavaScript floating point is not used for financial arithmetic.
-- [ ] Lint, typecheck, test, coverage validation, and build pass.
-- [ ] Story and sprint status are updated.
+## Burndown
 
-## Burndown Tracking
+| День | Целевое завершение | Остаток |
+|---|---|---:|
+| 1 | Старт | 19 |
+| 2 | STORY-024 | 16 |
+| 5 | STORY-016 | 8 |
+| 9 | STORY-017 | 0 |
+| 10 | Hardening и закрытие | 0 |
 
-| Date | Completed | Remaining | Ideal Remaining | Notes |
-|---|---:|---:|---:|---|
-| 2026-07-28 | 0 | 18 | 18 | Sprint begins |
-| 2026-07-30 | - | - | 14 | Target: STORY-008 complete |
-| 2026-08-04 | - | - | 7 | Target: STORY-014 complete |
-| 2026-08-07 | - | - | 2 | Target: STORY-015 complete |
-| 2026-08-10 | - | - | 0 | Hardening and sprint close |
+## Следующий UI backlog
 
-## Deferred Backlog
+После Sprint 5 нужен отдельный UI-completion sprint, потому что существующие backend stories допускали optional UI. Приоритетная последовательность:
 
-1. STORY-016 — Offline expense creation.
-2. STORY-017 — Synchronize expenses after connectivity returns.
-3. STORY-013 — Manual exchange-rate override.
-4. STORY-005 — Edit trip base currency.
-5. STORY-006 — Archive and delete trip.
-6. STORY-010 — Edit own expense with role rules.
-
-The next likely theme after Sprint 4 is offline expense synchronization (`STORY-016` and `STORY-017`), because the canonical online expense and derived balance contracts will then both be stable.
+1. регистрация, invite join и создание поездки;
+2. online history и balance/breakdown screens;
+3. RU/EN (`STORY-018`) и полный responsive/PWA контур (`STORY-019`);
+4. UI редактирования расхода, курса и настроек поездки.

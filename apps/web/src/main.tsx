@@ -1,21 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { App } from "./app/App.js";
 import "./styles.css";
-
-function App() {
-  return (
-    <main className="app-shell">
-      <section className="intro">
-        <p className="eyebrow">Owebee</p>
-        <h1>Trip expenses without spreadsheet archaeology.</h1>
-        <p>
-          The product foundation is ready for trips, guests, families, currencies,
-          and offline-friendly expense tracking.
-        </p>
-      </section>
-    </main>
-  );
-}
 
 const rootElement = document.getElementById("root");
 
@@ -28,4 +14,3 @@ createRoot(rootElement).render(
     <App />
   </StrictMode>
 );
-
