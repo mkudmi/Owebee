@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Owebee — UX Validation Report</title>
+<style>
+:root{--bg:#fafaf9;--surface:#fff;--border:#e7e5e4;--text:#1c1917;--muted:#78716c;--strong:#16a34a;--adequate:#65a30d;--medium:#ca8a04}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 Inter,system-ui,sans-serif}.container{max-width:960px;margin:auto;padding:32px 24px 64px}
+header{border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:24px}h1{font-size:24px;margin:0}.path{color:var(--muted);font:12px ui-monospace,monospace}
+.synthesis,details{background:var(--surface);border:1px solid var(--border);border-radius:8px}.synthesis{border-left:3px solid var(--strong);padding:18px 22px;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:24px}.card{background:white;border:1px solid var(--border);border-radius:8px;padding:12px 14px}.name{color:var(--muted);font-size:13px}.verdict{color:var(--strong);font-weight:700}.verdict.adequate{color:var(--adequate)}
+section{margin-bottom:14px}summary{display:flex;align-items:center;gap:12px;padding:14px 20px;cursor:pointer}summary h2{font-size:16px;margin:0;flex:1}.pill{background:var(--strong);color:white;border-radius:999px;padding:3px 10px;font-size:11px;font-weight:700;text-transform:uppercase}.body{padding:0 20px 18px}.finding{border-top:1px solid var(--border);padding:14px 0}.badge{display:inline-block;background:#fef3c7;color:#713f12;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;text-transform:uppercase}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font:12px ui-monospace,monospace}
+</style>
+</head>
+<body>
+<main class="container">
+<header><h1>Owebee — UX Design Validation</h1><div class="path">DESIGN.md + EXPERIENCE.md · 2026-06-30T20:50:55+03:00</div></header>
+<div class="synthesis"><p>The updated UX contract is ready for implementation planning. All critical and high pre-update findings are resolved.</p><p>Six product decisions remain explicit and scoped. Accessibility has a strong WCAG 2.2 AA specification floor; runtime testing remains required.</p></div>
+<div class="grid">
+<div class="card"><div class="name">Flow coverage</div><div class="verdict">strong</div></div>
+<div class="card"><div class="name">Token completeness</div><div class="verdict">strong</div></div>
+<div class="card"><div class="name">Component coverage</div><div class="verdict">strong</div></div>
+<div class="card"><div class="name">State coverage</div><div class="verdict">strong</div></div>
+<div class="card"><div class="name">Visual references</div><div class="verdict">strong</div></div>
+<div class="card"><div class="name">Bloat</div><div class="verdict adequate">adequate</div></div>
+<div class="card"><div class="name">Inheritance</div><div class="verdict">strong</div></div>
+<div class="card"><div class="name">Shape fit</div><div class="verdict">strong</div></div>
+</div>
+<section><details open><summary><h2>Mechanical validation</h2><span class="pill">strong</span></summary><div class="body"><p>YAML parses, 54 token references resolve, 21 component names match, all 31 requirements have dispositions, all links resolve, and five flows each contain a climax and failure path.</p></div></details></section>
+<section><details open><summary><h2>Accessibility</h2><span class="pill">strong</span></summary><div class="body"><p>Boundary and focus defects are corrected. WCAG 2.2 AA, accessible authentication, forced colors, TalkBack, reduced motion, reflow, and non-transcription deletion are specified.</p></div></details></section>
+<section><details open><summary><h2>Remaining work</h2><span class="pill" style="background:var(--medium)">medium</span></summary><div class="body"><div class="finding"><span class="badge">medium</span><p>Resolve the six named product decisions before moving affected stories to implementation-ready.</p></div><div class="finding"><span class="badge">low</span><p>Run the accessibility test matrix against the implementation.</p></div></div></details></section>
+<footer>Rubric: bmad-ux/references/validate.md · Generated 2026-06-30T20:50:55+03:00</footer>
+</main>
+</body>
+</html>

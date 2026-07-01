@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Owebee — Expense form</title>
+<style>
+/* Governed by DESIGN.md Components and EXPERIENCE.md Flow 3, Component Patterns, Responsive & Platform. */
+:root{--bg:#f7f7fb;--surface:#fff;--ink:#172033;--muted:#4b5563;--primary:#1d4ed8;--border:#64748b;--subtle:#cbd5e1;--info:#eff6ff;--focus:#0f172a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif}.stage{min-height:100vh;display:grid;place-items:center;padding:24px}.phone{width:min(390px,100%);min-height:780px;background:var(--surface);border:1px solid var(--subtle);border-radius:28px;box-shadow:0 16px 40px rgba(23,32,51,.14);overflow:hidden}
+header{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--subtle)}header button{border:0;background:none;font:inherit;color:var(--primary)}h1{font-size:20px;margin:0}.content{padding:18px 20px 110px}label{display:block;font-weight:600;margin:14px 0 6px}.pair{display:grid;grid-template-columns:1fr 105px;gap:8px}
+input,select{width:100%;min-height:48px;border:1px solid var(--border);border-radius:8px;background:white;padding:10px 12px;font:inherit;color:inherit}.amount{font-size:24px;font-weight:700}.summary{margin-top:18px;padding:14px;background:var(--info);border-radius:8px}.summary strong{display:block}.meta{color:var(--muted);font-size:14px}
+.more{display:block;margin:18px 0;color:var(--primary);font-weight:600;text-decoration:none}.sticky{position:absolute;bottom:0;width:min(388px,calc(100vw - 50px));padding:14px 20px 22px;background:linear-gradient(transparent,white 20%);border-radius:0 0 28px 28px}.save{width:100%;min-height:48px;border:0;border-radius:8px;background:var(--primary);color:white;font:600 16px Inter,system-ui}:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <section class="phone" aria-label="Expense form mockup" style="position:relative">
+    <header><button type="button">Cancel</button><h1>Add expense</h1></header>
+    <div class="content">
+      <label for="amount">Amount and currency</label>
+      <div class="pair"><input class="amount" id="amount" inputmode="decimal" value="48.20"><select aria-label="Currency"><option>EUR €</option></select></div>
+      <label for="description">Description</label><input id="description" value="Dinner">
+      <label for="payer">Paid by</label><select id="payer"><option>Elena</option></select>
+      <label for="split">Split among</label><select id="split"><option>Everyone · 5 personal shares</option></select>
+      <a class="more" href="#">More options</a>
+      <div class="summary"><strong>Review</strong>Elena paid €48.20. Split across 5 personal shares.<div class="meta">€1 = ₽92.50 · €48.20 becomes ₽4,458.50</div></div>
+    </div>
+    <div class="sticky"><button class="save" type="button">Add €48.20</button></div>
+  </section>
+</main>
+</body>
+</html>

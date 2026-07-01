@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Owebee — Sync conflict</title>
+<style>
+/* Governed by DESIGN.md Sync Center/Dialog and EXPERIENCE.md Offline & Sync, Flow 4 failure. */
+:root{--bg:#f7f7fb;--surface:#fff;--ink:#172033;--muted:#4b5563;--primary:#1d4ed8;--danger:#b91c1c;--danger-bg:#fef2f2;--border:#64748b;--subtle:#cbd5e1;--focus:#0f172a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif}.stage{min-height:100vh;display:grid;place-items:center;padding:24px}.dialog{width:min(760px,100%);background:white;border-radius:12px;box-shadow:0 16px 40px rgba(23,32,51,.18);overflow:hidden}
+header{padding:20px 24px;border-bottom:1px solid var(--subtle)}h1{font-size:24px;margin:0 0 4px}.status{color:var(--danger);font-weight:700}.content{padding:24px}.intro{margin:0 0 20px}.compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}.panel{border:1px solid var(--subtle);border-radius:8px;padding:16px}.panel h2{font-size:16px;margin:0 0 12px}.field{border-top:1px solid var(--subtle);padding:10px 0}.field:first-of-type{border:0}.field span{display:block;color:var(--muted);font-size:13px}.safe{background:var(--danger-bg);padding:12px;border-radius:8px;margin-top:18px;color:var(--danger)}
+.actions{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--subtle)}button{min-height:44px;border-radius:8px;padding:10px 16px;font:600 15px Inter,system-ui}.secondary{background:white;color:var(--ink);border:1px solid var(--border)}.primary{background:var(--primary);color:white;border:1px solid var(--primary)}:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+@media(max-width:620px){.stage{padding:0}.dialog{min-height:100vh;border-radius:0}.compare{grid-template-columns:1fr}.actions{position:sticky;bottom:0;background:white;flex-direction:column-reverse}.actions button{width:100%}}
+</style>
+</head>
+<body>
+<main class="stage">
+  <section class="dialog" role="dialog" aria-labelledby="title" aria-modal="true">
+    <header><div class="status">Needs attention</div><h1 id="title">Dinner changed while you were offline</h1></header>
+    <div class="content">
+      <p class="intro">Compare the changed fields. Your offline change stays on this device until you choose.</p>
+      <div class="compare">
+        <section class="panel"><h2>Current trip version</h2><div class="field"><span>Amount</span><strong>€52.00</strong></div><div class="field"><span>Description</span><strong>Dinner and taxi</strong></div></section>
+        <section class="panel"><h2>Your offline change</h2><div class="field"><span>Amount</span><strong>€48.20</strong></div><div class="field"><span>Description</span><strong>Dinner</strong></div></section>
+      </div>
+      <div class="safe">Nothing will be discarded until this conflict is resolved or you copy your local values.</div>
+    </div>
+    <div class="actions"><button class="secondary" type="button">Use current version</button><button class="primary" type="button">Apply my values</button></div>
+  </section>
+</main>
+</body>
+</html>

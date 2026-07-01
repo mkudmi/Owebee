@@ -100,7 +100,10 @@ export class InviteService {
     };
   }
 
-  async getGuestBySessionToken(token: string): Promise<GuestSessionActor | null> {
+  async getGuestBySessionToken(
+    token: string,
+    options: { includeForbiddenContext?: boolean } = {}
+  ): Promise<GuestSessionActor | null> {
     const sessionHash = hashSessionToken(token);
     const result = await this.database.query<{
       member_id: string;
@@ -121,11 +124,16 @@ export class InviteService {
         join trips on trips.id = trip_members.trip_id
         where guest_sessions.session_hash = $1
           and guest_sessions.revoked_at is null
-          and trip_members.status = 'active'
-          and trips.status <> 'deleted'
+          and (
+            $2::boolean
+            or (
+              trip_members.status = 'active'
+              and trips.status <> 'deleted'
+            )
+          )
         limit 1
       `,
-      [sessionHash]
+      [sessionHash, options.includeForbiddenContext === true]
     );
     const actor = result.rows[0];
 

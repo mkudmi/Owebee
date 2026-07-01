@@ -8,7 +8,8 @@ export type TripActor =
 
 export async function resolveTripActor(
   authorizationHeader: string | undefined,
-  services: { authService: AuthService; inviteService: InviteService }
+  services: { authService: AuthService; inviteService: InviteService },
+  options: { includeForbiddenGuestContext?: boolean } = {}
 ): Promise<TripActor | null> {
   const token = parseBearerToken(authorizationHeader);
   if (!token) {
@@ -24,7 +25,9 @@ export async function resolveTripActor(
     }
   }
 
-  const guest = await services.inviteService.getGuestBySessionToken(token);
+  const guest = await services.inviteService.getGuestBySessionToken(token, {
+    includeForbiddenContext: options.includeForbiddenGuestContext
+  });
   return guest
     ? { type: "guest", memberId: guest.memberId, tripId: guest.tripId }
     : null;

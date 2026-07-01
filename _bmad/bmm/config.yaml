@@ -11,6 +11,6 @@ project_knowledge: "{project-root}/docs"
 # Core Configuration Values
 user_name: Mku
 project_name: Owebee
-communication_language: English
-document_output_language: English
+communication_language: Russian
+document_output_language: Russian
 output_folder: _bmad-output

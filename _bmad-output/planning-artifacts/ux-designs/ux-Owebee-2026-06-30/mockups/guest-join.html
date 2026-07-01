@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Owebee — Guest join</title>
+<style>
+/* Governed by DESIGN.md Colors, Typography, Components and EXPERIENCE.md Flow 2, State Patterns. */
+:root{--bg:#f7f7fb;--surface:#fff;--ink:#172033;--muted:#4b5563;--primary:#1d4ed8;--border:#64748b;--subtle:#cbd5e1;--focus:#0f172a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif}
+.stage{min-height:100vh;display:grid;place-items:center;padding:24px}.phone{width:min(390px,100%);min-height:760px;background:var(--surface);border:1px solid var(--subtle);border-radius:28px;box-shadow:0 16px 40px rgba(23,32,51,.14);overflow:hidden}
+header{padding:18px 20px;border-bottom:1px solid var(--subtle);font-weight:700}.content{padding:32px 20px}
+.eyebrow{color:var(--muted);font-size:14px;margin:0 0 4px}h1{font-size:28px;line-height:1.2;margin:0 0 8px}p{margin:0 0 24px}.trip{background:var(--bg);border-radius:12px;padding:16px;margin-bottom:24px}.trip strong{display:block}.trip span{color:var(--muted);font-size:14px}
+label{display:block;font-weight:600;margin:16px 0 6px}input{width:100%;min-height:48px;border:1px solid var(--border);border-radius:8px;padding:11px 12px;font:inherit;color:inherit}input:focus{outline:3px solid var(--focus);outline-offset:2px}
+.hint{font-size:14px;color:var(--muted);margin:6px 0 0}button{width:100%;min-height:48px;margin-top:24px;border:0;border-radius:8px;background:var(--primary);color:white;font:600 16px/1.2 Inter,system-ui,sans-serif}
+.privacy{font-size:14px;color:var(--muted);margin-top:16px}:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+</style>
+</head>
+<body>
+<main class="stage">
+  <section class="phone" aria-label="Guest join screen mockup">
+    <header>Owebee</header>
+    <div class="content">
+      <p class="eyebrow">You’re invited</p>
+      <h1>Join Georgia 2026</h1>
+      <p>Anna invited you to share trip expenses.</p>
+      <div class="trip"><strong>Georgia 2026</strong><span>Base currency: RUB</span></div>
+      <form>
+        <label for="name">Your name</label>
+        <input id="name" autocomplete="name" value="Mikhail">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="email" value="mikhail@example.com">
+        <p class="hint">Used only to recover access to this trip.</p>
+        <button type="button">Join trip</button>
+      </form>
+      <p class="privacy">No password or full account required.</p>
+    </div>
+  </section>
+</main>
+</body>
+</html>

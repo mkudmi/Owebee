@@ -406,7 +406,7 @@ sprints:
       notes: "Sprint 3 completed at 19/19 points; all API tests, typecheck, lint and build passed."
 
   - number: 4
-    status: "not_started"
+    status: "in_progress"
     start_date: "2026-07-28"
     end_date: "2026-08-10"
     sprint_goal: "Turn accepted expenses into an explainable, zero-sum trip balance for members and families."
@@ -425,8 +425,8 @@ sprints:
         epic: "EPIC-003"
         priority: "Must Have"
         points: 5
-        status: "not_started"
-        started_date: null
+        status: "review"
+        started_date: "2026-06-30"
         completed_date: null
         dependencies: ["STORY-007", "STORY-009"]
         blocked_by: null
@@ -437,8 +437,8 @@ sprints:
         epic: "EPIC-006"
         priority: "Must Have"
         points: 8
-        status: "not_started"
-        started_date: null
+        status: "review"
+        started_date: "2026-06-30"
         completed_date: null
         dependencies: ["STORY-008", "STORY-009", "STORY-011"]
         blocked_by: null
@@ -449,8 +449,8 @@ sprints:
         epic: "EPIC-006"
         priority: "Should Have"
         points: 5
-        status: "not_started"
-        started_date: null
+        status: "review"
+        started_date: "2026-06-30"
         completed_date: null
         dependencies: ["STORY-008", "STORY-014"]
         blocked_by: null
@@ -631,5 +631,10 @@ project_progress:
 
 retrospectives: []
 
-last_updated: "2026-06-30 20:10:00"
-updated_by: "scrum-master"
+last_updated: "2026-07-01 13:58:20"
+updated_by: "developer"
+
+development_status:
+  STORY-008: done
+  STORY-014: done
+  STORY-015: done

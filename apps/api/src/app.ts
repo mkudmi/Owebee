@@ -2,6 +2,8 @@ import Fastify from "fastify";
 import { loadConfig } from "@owebee/config";
 import { AuthService } from "./auth/auth-service.js";
 import { registerAuthRoutes } from "./auth/auth-routes.js";
+import { registerBalanceRoutes } from "./calculation/balance-routes.js";
+import { BalanceService } from "./calculation/balance-service.js";
 import {
   CurrencyService,
   type CurrencyRateProvider
@@ -65,6 +67,11 @@ export async function buildApp(options: BuildAppOptions = {}) {
     authService,
     inviteService,
     expenseService: new ExpenseService(database, currencyService)
+  });
+  await registerBalanceRoutes(app, {
+    authService,
+    inviteService,
+    balanceService: new BalanceService(database)
   });
   await registerSyncRoutes(app, {
     authService,
