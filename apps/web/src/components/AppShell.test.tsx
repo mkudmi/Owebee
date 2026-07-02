@@ -5,6 +5,8 @@ import {
   AppShell,
   type WorkspaceViewState
 } from "./AppShell.js";
+import type { ExpenseCreateMutation } from "../offline/outbox.js";
+import type { WorkspaceReferenceSnapshot } from "../offline/workspace-reference-cache.js";
 
 const session = {
   version: 1 as const,
@@ -115,5 +117,112 @@ describe("AppShell", () => {
     expect(html).toContain("48.20 EUR");
     expect(html).toContain("Плательщик: Елена");
     expect(html).toContain("1 июля 2026 г.");
+  });
+
+  it("keeps pending local expenses in the normal list with a non-color status", () => {
+    const pending: ExpenseCreateMutation = {
+      clientMutationId: "local-expense-1",
+      tripId: "trip-1",
+      type: "expense.create",
+      createdAt: "2026-07-01T10:00:00.000Z",
+      status: "pending",
+      payload: {
+        payerMemberId: "member-1",
+        amount: "48.20",
+        currencyCode: "EUR",
+        expenseDate: "2026-07-01",
+        description: "Ужин offline",
+        splitTargets: [{ type: "member", id: "member-1" }]
+      }
+    };
+    const references: WorkspaceReferenceSnapshot = {
+      tripId: "trip-1",
+      members: [
+        { id: "member-1", displayName: "Елена", role: "participant" }
+      ],
+      families: [],
+      currencies: [
+        { code: "EUR", displayName: "Евро", symbol: "€", minorUnits: 2 }
+      ],
+      updatedAt: "2026-07-01T10:00:00.000Z"
+    };
+    const html = renderToStaticMarkup(
+      <AppShell
+        state={{ kind: "empty", session }}
+        onRetry={vi.fn()}
+        pendingExpenses={[pending]}
+        references={references}
+        onOpenExpenseForm={vi.fn()}
+      />
+    );
+
+    expect(html).toContain('aria-label="Последние расходы"');
+    expect(html).toContain("Ужин offline");
+    expect(html).toContain("48.20 EUR");
+    expect(html).toContain("Плательщик: Елена");
+    expect(html).toContain("Ожидает синхронизации");
+    expect(html).toContain(
+      "1 локальное изменение ещё не включено в серверный баланс"
+    );
+    expect(html).not.toContain("Расходов пока нет");
+  });
+
+  it("offers expense creation only when cached references are available", () => {
+    const references: WorkspaceReferenceSnapshot = {
+      tripId: "trip-1",
+      members: [
+        { id: "member-1", displayName: "Елена", role: "participant" }
+      ],
+      families: [],
+      currencies: [
+        { code: "RUB", displayName: "Рубль", symbol: "₽", minorUnits: 2 }
+      ],
+      updatedAt: "2026-07-01T10:00:00.000Z"
+    };
+    const available = renderToStaticMarkup(
+      <AppShell
+        state={{ kind: "empty", session }}
+        onRetry={vi.fn()}
+        references={references}
+        onOpenExpenseForm={vi.fn()}
+      />
+    );
+    const unavailable = render({ kind: "empty", session });
+
+    expect(available).toContain("Добавить расход");
+    expect(unavailable).toContain(
+      "Подключитесь к сети один раз, чтобы загрузить участников и валюты"
+    );
+  });
+
+  it("keeps pending payer identity and warns when local outbox reading fails", () => {
+    const payerMemberId = "00000000-0000-0000-0000-000000000010";
+    const pending: ExpenseCreateMutation = {
+      clientMutationId: "00000000-0000-0000-0000-000000000001",
+      tripId: "00000000-0000-0000-0000-000000000100",
+      type: "expense.create",
+      createdAt: "2026-07-01T10:00:00.000Z",
+      status: "pending",
+      payload: {
+        payerMemberId,
+        amount: "48.20",
+        currencyCode: "EUR",
+        expenseDate: "2026-07-01",
+        description: "Ужин offline",
+        splitTargets: [{ type: "member", id: payerMemberId }]
+      }
+    };
+    const html = renderToStaticMarkup(
+      <AppShell
+        state={{ kind: "empty", session }}
+        onRetry={vi.fn()}
+        pendingExpenses={[pending]}
+        localReadError="Не удалось прочитать локально сохранённые расходы."
+      />
+    );
+
+    expect(html).toContain(`Плательщик: ID ${payerMemberId}`);
+    expect(html).toContain("Не удалось прочитать локально сохранённые расходы.");
+    expect(html).toContain("Проверить снова");
   });
 });

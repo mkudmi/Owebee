@@ -19,6 +19,35 @@ export interface ExpenseListPage {
   nextCursor: string | null;
 }
 
+export interface ParticipantReference {
+  id: string;
+  displayName: string;
+  email: string | null;
+  role: "owner" | "participant";
+  status: "active" | "archived";
+}
+
+export interface FamilyReference {
+  id: string;
+  tripId: string;
+  displayName: string;
+  shareCount: string;
+  status: "active";
+}
+
+export interface ParticipantsPage {
+  tripId: string;
+  members: ParticipantReference[];
+  families: FamilyReference[];
+}
+
+export interface CurrencyReference {
+  code: string;
+  displayName: string;
+  symbol: string | null;
+  minorUnits: number;
+}
+
 export type WorkspaceApiErrorKind =
   | "unauthorized"
   | "unavailable"
@@ -49,47 +78,51 @@ export function createOwebeeApi(options: {
   const baseUrl = options.baseUrl.replace(/\/+$/, "");
   const requestTimeoutMs = options.requestTimeoutMs ?? 15_000;
 
+  async function request(
+    url: string,
+    init: Omit<RequestInit, "signal">,
+    unavailableMessage: string
+  ): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), requestTimeoutMs);
+
+    try {
+      return await fetchImpl(url, { ...init, signal: controller.signal });
+    } catch {
+      throw new WorkspaceApiError("unavailable", unavailableMessage);
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+
+  function ensureSuccess(response: Response, unavailableMessage: string) {
+    if (response.ok) return;
+
+    if (response.status === 401 || response.status === 403) {
+      throw new WorkspaceApiError(
+        "unauthorized",
+        "Сессия больше не действует."
+      );
+    }
+
+    throw new WorkspaceApiError("unavailable", unavailableMessage);
+  }
+
   return {
     async listRecentExpenses(
       session: WorkspaceSession
     ): Promise<ExpenseListPage> {
-      let response: Response;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), requestTimeoutMs);
-
-      try {
-        response = await fetchImpl(
+      const response = await request(
           `${baseUrl}/api/v1/trips/${encodeURIComponent(session.tripId)}/expenses?limit=5`,
           {
             headers: {
               Accept: "application/json",
               Authorization: `Bearer ${session.token}`
-            },
-            signal: controller.signal
-          }
-        );
-      } catch {
-        throw new WorkspaceApiError(
-          "unavailable",
+            }
+          },
           "Не удалось загрузить расходы. Проверьте соединение и попробуйте снова."
         );
-      } finally {
-        clearTimeout(timeoutId);
-      }
-
-      if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
-          throw new WorkspaceApiError(
-            "unauthorized",
-            "Сессия больше не действует."
-          );
-        }
-
-        throw new WorkspaceApiError(
-          "unavailable",
-          "Не удалось загрузить расходы. Попробуйте снова."
-        );
-      }
+      ensureSuccess(response, "Не удалось загрузить расходы. Попробуйте снова.");
 
       try {
         const payload: unknown = await response.json();
@@ -101,6 +134,63 @@ export function createOwebeeApi(options: {
         throw new WorkspaceApiError(
           "invalid-response",
           "Сервис вернул неожиданный ответ. Попробуйте снова."
+        );
+      }
+    },
+
+    async listParticipants(
+      session: WorkspaceSession
+    ): Promise<ParticipantsPage> {
+      const response = await request(
+        `${baseUrl}/api/v1/trips/${encodeURIComponent(session.tripId)}/participants`,
+        {
+          headers: {
+            Accept: "application/json",
+            Authorization: `Bearer ${session.token}`
+          }
+        },
+        "Не удалось загрузить участников. Проверьте соединение."
+      );
+      ensureSuccess(
+        response,
+        "Не удалось загрузить участников. Попробуйте снова."
+      );
+
+      try {
+        const payload: unknown = await response.json();
+        if (
+          !isParticipantsPage(payload) ||
+          payload.tripId !== session.tripId
+        ) {
+          throw new Error("Invalid response");
+        }
+        return payload;
+      } catch {
+        throw new WorkspaceApiError(
+          "invalid-response",
+          "Сервис вернул некорректный список участников."
+        );
+      }
+    },
+
+    async listCurrencies(): Promise<CurrencyReference[]> {
+      const response = await request(
+        `${baseUrl}/api/v1/currencies`,
+        { headers: { Accept: "application/json" } },
+        "Не удалось загрузить валюты. Проверьте соединение."
+      );
+      ensureSuccess(response, "Не удалось загрузить валюты. Попробуйте снова.");
+
+      try {
+        const payload: unknown = await response.json();
+        if (!isCurrenciesPayload(payload)) {
+          throw new Error("Invalid response");
+        }
+        return payload.currencies;
+      } catch {
+        throw new WorkspaceApiError(
+          "invalid-response",
+          "Сервис вернул некорректный список валют."
         );
       }
     }
@@ -137,8 +227,89 @@ function isExpenseListItem(value: unknown): value is ExpenseListItem {
   );
 }
 
+function isParticipantsPage(value: unknown): value is ParticipantsPage {
+  if (
+    !isRecord(value) ||
+    !isUuid(value.tripId) ||
+    !Array.isArray(value.members) ||
+    !value.members.every(isParticipantReference) ||
+    !Array.isArray(value.families) ||
+    !value.families.every(isFamilyReference)
+  ) {
+    return false;
+  }
+
+  return (
+    value.families.every((family) => family.tripId === value.tripId) &&
+    hasUniqueValues(value.members.map((member) => member.id)) &&
+    hasUniqueValues(value.families.map((family) => family.id))
+  );
+}
+
+function isParticipantReference(value: unknown): value is ParticipantReference {
+  return (
+    isRecord(value) &&
+    isUuid(value.id) &&
+    hasText(value, "displayName") &&
+    (value.email === null || typeof value.email === "string") &&
+    (value.role === "owner" || value.role === "participant") &&
+    (value.status === "active" || value.status === "archived")
+  );
+}
+
+function isFamilyReference(value: unknown): value is FamilyReference {
+  return (
+    isRecord(value) &&
+    isUuid(value.id) &&
+    isUuid(value.tripId) &&
+    hasText(value, "displayName") &&
+    hasPositiveDecimal(value, "shareCount") &&
+    value.status === "active"
+  );
+}
+
+function isCurrenciesPayload(
+  value: unknown
+): value is { currencies: CurrencyReference[] } {
+  if (
+    !isRecord(value) ||
+    !Array.isArray(value.currencies) ||
+    !value.currencies.every(isCurrencyReference)
+  ) {
+    return false;
+  }
+
+  return hasUniqueValues(value.currencies.map((currency) => currency.code));
+}
+
+function isCurrencyReference(value: unknown): value is CurrencyReference {
+  return (
+    isRecord(value) &&
+    typeof value.code === "string" &&
+    /^[A-Z]{3}$/.test(value.code) &&
+    hasText(value, "displayName") &&
+    (value.symbol === null || typeof value.symbol === "string") &&
+    typeof value.minorUnits === "number" &&
+    Number.isInteger(value.minorUnits) &&
+    value.minorUnits >= 0 &&
+    value.minorUnits <= 12
+  );
+}
+
 function hasText(value: Record<string, unknown>, key: string): boolean {
   return typeof value[key] === "string" && value[key].length > 0;
+}
+
+function hasPositiveDecimal(
+  value: Record<string, unknown>,
+  key: string
+): boolean {
+  const candidate = value[key];
+  return (
+    typeof candidate === "string" &&
+    /^(?:0|[1-9]\d*)(?:\.\d+)?$/.test(candidate) &&
+    /[1-9]/.test(candidate)
+  );
 }
 
 function hasIsoDate(value: Record<string, unknown>, key: string): boolean {
@@ -154,6 +325,19 @@ function hasIsoDate(value: Record<string, unknown>, key: string): boolean {
   return (
     !Number.isNaN(date.getTime()) &&
     date.toISOString().slice(0, 10) === candidate
+  );
+}
+
+function hasUniqueValues(values: string[]): boolean {
+  return new Set(values).size === values.length;
+}
+
+function isUuid(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      value
+    )
   );
 }
 

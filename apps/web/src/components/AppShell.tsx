@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import type { ExpenseListItem } from "../api/owebee-api.js";
 import type { WorkspaceSession } from "../app/session.js";
+import type { ExpenseFormProps } from "./ExpenseForm.js";
+import { ExpenseForm } from "./ExpenseForm.js";
+import type { ExpenseCreateMutation } from "../offline/outbox.js";
+import type { WorkspaceReferenceSnapshot } from "../offline/workspace-reference-cache.js";
 
 export type WorkspaceViewState =
   | { kind: "no-session" }
@@ -16,6 +20,12 @@ export type WorkspaceViewState =
 export interface AppShellProps {
   state: WorkspaceViewState;
   onRetry(): void;
+  pendingExpenses?: ExpenseCreateMutation[];
+  references?: WorkspaceReferenceSnapshot | null;
+  onOpenExpenseForm?(): void;
+  expenseForm?: ExpenseFormProps | null;
+  announcement?: string | null;
+  localReadError?: string | null;
 }
 
 const navigation = [
@@ -35,15 +45,30 @@ const navigation = [
   { label: "Люди", href: null, section: null, icon: PeopleIcon }
 ] as const;
 
-export function AppShell({ state, onRetry }: AppShellProps) {
+export function AppShell({
+  state,
+  onRetry,
+  pendingExpenses = [],
+  references = null,
+  onOpenExpenseForm,
+  expenseForm = null,
+  announcement = null,
+  localReadError = null
+}: AppShellProps) {
   const session = state.kind === "no-session" ? null : state.session;
   const tripName = session?.tripName;
-  const connectionStatus = getConnectionStatus(state);
+  const connectionStatus = getConnectionStatus(state, pendingExpenses.length);
 
   return (
     <div
       className={
-        session ? "app-shell app-shell-authenticated" : "app-shell"
+        [
+          "app-shell",
+          session ? "app-shell-authenticated" : "",
+          expenseForm ? "app-shell-form" : ""
+        ]
+          .filter(Boolean)
+          .join(" ")
       }
     >
       <a className="skip-link" href="#main-content">
@@ -72,13 +97,31 @@ export function AppShell({ state, onRetry }: AppShellProps) {
         </div>
       </header>
 
-      {session ? <TripNavigation /> : null}
+      {session && !expenseForm ? <TripNavigation /> : null}
 
-      <main id="main-content" className="workspace" tabIndex={-1}>
-        {state.kind === "no-session" ? (
+      <main
+        id="main-content"
+        className={expenseForm ? "workspace workspace-form" : "workspace"}
+        tabIndex={-1}
+      >
+        {announcement ? (
+          <div className="save-confirmation" role="status">
+            {announcement}
+          </div>
+        ) : null}
+        {expenseForm ? (
+          <ExpenseForm {...expenseForm} />
+        ) : state.kind === "no-session" ? (
           <NoSessionState />
         ) : (
-          <WorkspaceContent state={state} onRetry={onRetry} />
+          <WorkspaceContent
+            state={state}
+            onRetry={onRetry}
+            pendingExpenses={pendingExpenses}
+            references={references}
+            onOpenExpenseForm={onOpenExpenseForm}
+            localReadError={localReadError}
+          />
         )}
       </main>
     </div>
@@ -148,18 +191,30 @@ export function activeSectionFromHash(
   return "overview";
 }
 
-function getConnectionStatus(state: WorkspaceViewState): {
+function getConnectionStatus(
+  state: WorkspaceViewState,
+  pendingCount: number
+): {
   label: string;
-  tone: "success" | "neutral" | "error";
+  tone: "success" | "neutral" | "warning" | "error";
 } {
+  if (state.kind === "error") {
+    return { label: "Ошибка загрузки", tone: "error" };
+  }
+
+  if (pendingCount > 0) {
+    return {
+      label: `${pendingCount} ожидает`,
+      tone: "warning"
+    };
+  }
+
   switch (state.kind) {
     case "ready":
     case "empty":
       return { label: "На связи", tone: "success" };
     case "loading":
       return { label: "Подключаемся", tone: "neutral" };
-    case "error":
-      return { label: "Ошибка загрузки", tone: "error" };
     case "no-session":
       return { label: "Нужен вход", tone: "neutral" };
   }
@@ -194,12 +249,29 @@ function NoSessionState() {
 
 function WorkspaceContent({
   state,
-  onRetry
+  onRetry,
+  pendingExpenses,
+  references,
+  onOpenExpenseForm,
+  localReadError
 }: {
   state: Exclude<WorkspaceViewState, { kind: "no-session" }>;
   onRetry(): void;
+  pendingExpenses: ExpenseCreateMutation[];
+  references: WorkspaceReferenceSnapshot | null;
+  onOpenExpenseForm: (() => void) | undefined;
+  localReadError: string | null;
 }) {
   const tripName = state.session.tripName ?? "Обзор поездки";
+  const canCreateExpense = Boolean(
+    references &&
+      references.members.length > 0 &&
+      references.currencies.length > 0 &&
+      references.members.length + references.families.length > 0 &&
+      onOpenExpenseForm
+  );
+  const serverExpenses = state.kind === "ready" ? state.expenses : [];
+  const hasExpenses = pendingExpenses.length + serverExpenses.length > 0;
 
   return (
     <>
@@ -226,16 +298,50 @@ function WorkspaceContent({
             <p className="section-kicker">Последние операции</p>
             <h2 id="expenses-title">Расходы</h2>
           </div>
-          <span className="section-meta">Показываем последние 5</span>
+          {canCreateExpense ? (
+            <button
+              className="button button-primary add-expense-button"
+              type="button"
+              onClick={onOpenExpenseForm}
+            >
+              <span aria-hidden="true">+</span>
+              Добавить расход
+            </button>
+          ) : (
+            <span className="section-meta">Показываем последние 5</span>
+          )}
         </div>
 
+        {localReadError ? (
+          <div className="local-read-error" role="alert">
+            <span>{localReadError}</span>
+            <button
+              className="button button-secondary"
+              type="button"
+              onClick={onRetry}
+            >
+              Проверить снова
+            </button>
+          </div>
+        ) : null}
+
+        {pendingExpenses.length > 0 ? (
+          <div className="pending-balance-notice" role="status">
+            {pendingNotice(pendingExpenses.length)}
+          </div>
+        ) : null}
+
         {state.kind === "loading" ? <LoadingState /> : null}
-        {state.kind === "empty" ? <EmptyState /> : null}
+        {state.kind === "empty" && !hasExpenses ? <EmptyState /> : null}
         {state.kind === "error" ? (
           <ErrorState message={state.message} onRetry={onRetry} />
         ) : null}
-        {state.kind === "ready" ? (
-          <ExpenseList expenses={state.expenses} />
+        {hasExpenses ? (
+          <ExpenseList
+            expenses={serverExpenses}
+            pendingExpenses={pendingExpenses}
+            references={references}
+          />
         ) : null}
       </section>
 
@@ -244,12 +350,25 @@ function WorkspaceContent({
           <SparkIcon />
         </span>
         <div>
-          <p className="section-kicker">Дальше в Sprint 5</p>
-          <h2 id="next-title">Быстрое добавление расходов</h2>
-          <p>
-            Mobile-first форма и надёжное сохранение без сети появятся в
-            следующей story.
-          </p>
+          {canCreateExpense ? (
+            <>
+              <p className="section-kicker">Local-first</p>
+              <h2 id="next-title">Расход не потеряется без сети</h2>
+              <p>
+                Сначала сохраним его на устройстве и явно отметим как ожидающий
+                синхронизации.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="section-kicker">Нужны справочники</p>
+              <h2 id="next-title">Подготовьте offline-форму</h2>
+              <p>
+                Подключитесь к сети один раз, чтобы загрузить участников и
+                валюты. После этого форма будет доступна без соединения.
+              </p>
+            </>
+          )}
         </div>
       </aside>
     </>
@@ -305,9 +424,48 @@ function ErrorState({
   );
 }
 
-function ExpenseList({ expenses }: { expenses: ExpenseListItem[] }) {
+function ExpenseList({
+  expenses,
+  pendingExpenses,
+  references
+}: {
+  expenses: ExpenseListItem[];
+  pendingExpenses: ExpenseCreateMutation[];
+  references: WorkspaceReferenceSnapshot | null;
+}) {
   return (
     <ul className="expense-list" aria-label="Последние расходы">
+      {pendingExpenses.map((mutation) => (
+        <li
+          className="expense-row expense-row-pending"
+          key={`pending:${mutation.clientMutationId}`}
+        >
+          <span className="expense-icon expense-icon-pending" aria-hidden="true">
+            <ReceiptIcon />
+          </span>
+          <div className="expense-main">
+            <strong>{mutation.payload.description}</strong>
+            <span>
+              Плательщик:{" "}
+              {references?.members.find(
+                (member) => member.id === mutation.payload.payerMemberId
+              )?.displayName ??
+                `ID ${mutation.payload.payerMemberId}`}{" "}
+              · {formatExpenseDate(mutation.payload.expenseDate)}
+            </span>
+            <span className="sync-badge sync-badge-pending">
+              <ClockIcon />
+              Ожидает синхронизации
+            </span>
+          </div>
+          <div className="expense-amount">
+            <strong>
+              {mutation.payload.amount} {mutation.payload.currencyCode}
+            </strong>
+            <span>На этом устройстве</span>
+          </div>
+        </li>
+      ))}
       {expenses.map((expense) => (
         <li className="expense-row" key={expense.id}>
           <span className="expense-icon" aria-hidden="true">
@@ -336,6 +494,12 @@ function ExpenseList({ expenses }: { expenses: ExpenseListItem[] }) {
       ))}
     </ul>
   );
+}
+
+function pendingNotice(count: number) {
+  return count === 1
+    ? "1 локальное изменение ещё не включено в серверный баланс."
+    : `${count} локальных изменений ещё не включены в серверный баланс.`;
 }
 
 function formatExpenseDate(value: string) {
@@ -404,6 +568,21 @@ function ReceiptIcon() {
         strokeLinejoin="round"
       />
       <path d="M9 8h6M9 12h4" stroke="currentColor" strokeWidth="1.7" />
+    </svg>
+  );
+}
+
+function ClockIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
+      <circle cx="12" cy="12" r="8" />
+      <path d="M12 7v5l3 2" />
     </svg>
   );
 }

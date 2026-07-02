@@ -35,13 +35,11 @@
 }
 
 html {
-  min-width: 320px;
   background: var(--background);
   scroll-behavior: smooth;
 }
 
 body {
-  min-width: 320px;
   min-height: 100vh;
   margin: 0;
   color: var(--text);
@@ -184,6 +182,11 @@ a {
 .connection-status-error {
   color: var(--danger);
   background: var(--danger-surface);
+}
+
+.connection-status-warning {
+  color: #92400e;
+  background: var(--brand-honey-soft);
 }
 
 .status-dot {
@@ -381,6 +384,11 @@ button.button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
 .button-primary {
   min-width: 160px;
   color: #ffffff;
@@ -489,6 +497,50 @@ button.button {
   white-space: nowrap;
 }
 
+.add-expense-button {
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.add-expense-button span {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.save-confirmation,
+.pending-balance-notice {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-sm);
+  color: #78350f;
+  background: var(--brand-honey-soft);
+  font-weight: 650;
+}
+
+.save-confirmation {
+  border-color: #bbf7d0;
+  color: var(--success);
+  background: var(--success-surface);
+}
+
+.local-read-error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  color: var(--danger);
+  background: var(--danger-surface);
+}
+
+.local-read-error .button {
+  flex: none;
+}
+
 .state-card {
   min-height: 180px;
   display: flex;
@@ -586,6 +638,37 @@ button.button {
   background: var(--surface);
 }
 
+.expense-row-pending {
+  border-color: #f4b942;
+  background: #fffdf5;
+}
+
+.expense-icon-pending {
+  color: #92400e;
+  background: var(--brand-honey-soft);
+}
+
+.sync-badge {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.sync-badge-pending {
+  color: #92400e !important;
+  background: var(--brand-honey-soft);
+}
+
+.sync-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
 .expense-main,
 .expense-amount {
   min-width: 0;
@@ -635,6 +718,204 @@ button.button {
   background: var(--brand-honey-soft);
 }
 
+.workspace-form {
+  max-width: none;
+  padding-bottom: 32px;
+}
+
+.app-shell-form .workspace-form {
+  max-width: none;
+}
+
+.expense-form-page {
+  width: min(100%, 760px);
+  margin: 0 auto;
+}
+
+.expense-form-header {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 72px;
+  align-items: start;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.expense-form-header h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.text-button {
+  min-height: 44px;
+  padding: 8px 4px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  color: var(--primary);
+  background: transparent;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.expense-form {
+  display: grid;
+  gap: 20px;
+  padding: 20px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.form-field {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+}
+
+.form-field > label,
+.split-fieldset legend {
+  font-weight: 750;
+}
+
+.form-field input,
+.form-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-control);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  background: var(--surface);
+}
+
+.form-field [aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.form-field :disabled,
+.split-fieldset:disabled .target-option {
+  cursor: not-allowed;
+  color: var(--text-muted);
+  background: var(--background);
+  opacity: 1;
+}
+
+.amount-currency-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(116px, 0.7fr);
+  gap: 8px;
+}
+
+.amount-input {
+  font-size: 22px !important;
+  font-variant-numeric: tabular-nums;
+  font-weight: 750;
+}
+
+.form-pair {
+  display: grid;
+  gap: 20px;
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.form-error-summary {
+  padding: 14px 16px;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  color: var(--danger);
+  background: var(--danger-surface);
+}
+
+.form-error-summary ul {
+  margin: 8px 0 0;
+  padding-left: 22px;
+}
+
+.split-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.field-help {
+  margin: 4px 0 12px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.target-list {
+  display: grid;
+  gap: 8px;
+}
+
+.target-option {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.target-option:has(input:checked) {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.target-option input {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  accent-color: var(--primary);
+}
+
+.target-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.target-copy span {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.offline-save-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  color: #78350f;
+  background: var(--brand-honey-soft);
+  font-size: 14px;
+}
+
+.offline-save-note svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  margin-top: 1px;
+}
+
+.expense-form-actions {
+  display: flex;
+}
+
+.form-submit {
+  width: 100%;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -642,6 +923,11 @@ button.button {
 }
 
 @media (max-width: 479px) {
+  .local-read-error {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .app-header {
     grid-template-columns: auto 1fr;
   }
@@ -678,6 +964,27 @@ button.button {
     gap: 2px;
   }
 
+  .add-expense-button {
+    width: 100%;
+  }
+
+  .expense-form-header {
+    grid-template-columns: 64px minmax(0, 1fr) 64px;
+  }
+
+  .expense-form-header h1 {
+    font-size: 24px;
+  }
+
+  .expense-form {
+    margin: 0 -8px;
+    padding: 16px;
+  }
+
+  .amount-currency-field {
+    grid-template-columns: minmax(0, 1fr) 118px;
+  }
+
   .state-card {
     align-items: flex-start;
     flex-direction: column;
@@ -699,6 +1006,14 @@ button.button {
     display: grid;
     grid-template-columns: 88px minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .app-shell-authenticated.app-shell-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-shell-form .workspace {
+    grid-column: 1;
   }
 
   .app-header {
@@ -758,6 +1073,14 @@ button.button {
   .coming-next h2 {
     font-size: 28px;
     line-height: 1.2;
+  }
+
+  .form-pair {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .expense-form {
+    padding: 28px;
   }
 
   .overview-grid,

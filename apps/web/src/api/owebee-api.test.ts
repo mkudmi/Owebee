@@ -7,6 +7,10 @@ const session = {
   token: "private-token",
   tripName: "Georgia 2026"
 };
+const referenceSession = {
+  ...session,
+  tripId: "00000000-0000-0000-0000-000000000100"
+};
 
 describe("Owebee API client", () => {
   it("loads recent expenses with an encoded trip and bearer session", async () => {
@@ -172,6 +176,196 @@ describe("Owebee API client", () => {
     });
 
     await expect(api.listRecentExpenses(session)).rejects.toMatchObject({
+      kind: "invalid-response"
+    });
+  });
+
+  it("loads participants and currencies for offline form references", async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            tripId: referenceSession.tripId,
+            members: [
+              {
+                id: "00000000-0000-0000-0000-000000000010",
+                displayName: "Елена",
+                email: "private@example.com",
+                role: "participant",
+                status: "active"
+              }
+            ],
+            families: [
+              {
+                id: "00000000-0000-0000-0000-000000000020",
+                tripId: referenceSession.tripId,
+                displayName: "Семья Ивановых",
+                shareCount: "2",
+                status: "active"
+              }
+            ]
+          }),
+          { status: 200 }
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            currencies: [
+              {
+                code: "RUB",
+                displayName: "Российский рубль",
+                symbol: "₽",
+                minorUnits: 2
+              },
+              {
+                code: "EUR",
+                displayName: "Евро",
+                symbol: "€",
+                minorUnits: 2
+              }
+            ]
+          }),
+          { status: 200 }
+        )
+      );
+    const api = createOwebeeApi({
+      baseUrl: "http://localhost:4000",
+      fetchImpl
+    });
+
+    const participants = await api.listParticipants(referenceSession);
+    const currencies = await api.listCurrencies();
+
+    expect(participants.members[0]).toMatchObject({
+      id: "00000000-0000-0000-0000-000000000010",
+      status: "active"
+    });
+    expect(currencies.map((currency) => currency.code)).toEqual(["RUB", "EUR"]);
+    expect(fetchImpl).toHaveBeenNthCalledWith(
+      1,
+      `http://localhost:4000/api/v1/trips/${referenceSession.tripId}/participants`,
+      expect.objectContaining({
+        headers: {
+          Accept: "application/json",
+          Authorization: "Bearer private-token"
+        }
+      })
+    );
+    expect(fetchImpl).toHaveBeenNthCalledWith(
+      2,
+      "http://localhost:4000/api/v1/currencies",
+      expect.objectContaining({
+        headers: { Accept: "application/json" }
+      })
+    );
+  });
+
+  it("rejects malformed participant and currency reference payloads", async () => {
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            tripId: "00000000-0000-0000-0000-000000000200",
+            members: [],
+            families: []
+          }),
+          { status: 200 }
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            currencies: [
+              {
+                code: "EURO",
+                displayName: "Wrong",
+                symbol: null,
+                minorUnits: 2
+              }
+            ]
+          }),
+          { status: 200 }
+        )
+      );
+    const api = createOwebeeApi({
+      baseUrl: "http://localhost:4000",
+      fetchImpl
+    });
+
+    await expect(api.listParticipants(referenceSession)).rejects.toMatchObject({
+      kind: "invalid-response"
+    });
+    await expect(api.listCurrencies()).rejects.toMatchObject({
+      kind: "invalid-response"
+    });
+  });
+
+  it("rejects non-UUID and duplicate reference identifiers", async () => {
+    const member = {
+      id: "00000000-0000-0000-0000-000000000010",
+      displayName: "Елена",
+      email: null,
+      role: "participant",
+      status: "active"
+    };
+    const fetchImpl = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            tripId: referenceSession.tripId,
+            members: [{ ...member, id: "member-1" }],
+            families: []
+          }),
+          { status: 200 }
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            tripId: referenceSession.tripId,
+            members: [member, member],
+            families: []
+          }),
+          { status: 200 }
+        )
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            currencies: [
+              {
+                code: "RUB",
+                displayName: "Рубль",
+                symbol: "₽",
+                minorUnits: 2
+              },
+              {
+                code: "RUB",
+                displayName: "Дубликат",
+                symbol: null,
+                minorUnits: 2
+              }
+            ]
+          }),
+          { status: 200 }
+        )
+      );
+    const api = createOwebeeApi({
+      baseUrl: "http://localhost:4000",
+      fetchImpl
+    });
+
+    await expect(api.listParticipants(referenceSession)).rejects.toMatchObject({
+      kind: "invalid-response"
+    });
+    await expect(api.listParticipants(referenceSession)).rejects.toMatchObject({
+      kind: "invalid-response"
+    });
+    await expect(api.listCurrencies()).rejects.toMatchObject({
       kind: "invalid-response"
     });
   });
