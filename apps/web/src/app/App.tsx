@@ -322,7 +322,7 @@ function readBrowserSession(): WorkspaceSession | null {
   ) {
     return {
       version: 1,
-      tripId: "expense-preview-trip",
+      tripId: "00000000-0000-4000-8000-000000000100",
       token: "development-preview",
       tripName: "Поездка в Грузию"
     };
@@ -369,21 +369,29 @@ async function requestPersistentStorage(): Promise<boolean> {
 function isExpensePreviewSession(session: WorkspaceSession): boolean {
   return (
     import.meta.env.DEV &&
-    session.tripId === "expense-preview-trip" &&
+    session.tripId === "00000000-0000-4000-8000-000000000100" &&
     session.token === "development-preview"
   );
 }
 
 function createExpensePreviewReferences(): WorkspaceReferenceSnapshot {
   return {
-    tripId: "expense-preview-trip",
+    tripId: "00000000-0000-4000-8000-000000000100",
     members: [
-      { id: "member-elena", displayName: "Елена", role: "owner" },
-      { id: "member-ivan", displayName: "Иван", role: "participant" }
+      {
+        id: "00000000-0000-4000-8000-000000000010",
+        displayName: "Елена",
+        role: "owner"
+      },
+      {
+        id: "00000000-0000-4000-8000-000000000011",
+        displayName: "Иван",
+        role: "participant"
+      }
     ],
     families: [
       {
-        id: "family-ivanovy",
+        id: "00000000-0000-4000-8000-000000000020",
         displayName: "Семья Ивановых",
         shareCount: "2"
       }

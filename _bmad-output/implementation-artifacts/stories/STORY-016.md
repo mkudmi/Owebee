@@ -8,7 +8,7 @@ baseline_commit: d83b229e9219428db223d3a7658639a977683174
 - **Epic:** EPIC-007 — PWA, offline и синхронизация
 - **Priority:** Must Have
 - **Story Points:** 8
-- **Status:** in-progress
+- **Status:** done
 
 ## User Story
 
@@ -71,6 +71,9 @@ baseline_commit: d83b229e9219428db223d3a7658639a977683174
 - [x] [Review][Patch] Проверять participant/family IDs как UUID до создания API-compatible payload и сохранения cache [apps/web/src/api/owebee-api.ts:244]
 - [x] [Review][Patch] Показывать идентичность payer у восстановленной pending row даже при недоступном reference cache [apps/web/src/components/AppShell.tsx:429]
 - [x] [Review][Patch] Не генерировать API-несовместимый fallback ID, если `crypto.randomUUID()` недоступен [apps/web/src/app/App.tsx:307]
+- [x] [Review][Patch] Не требовать системный Google Chrome в чистом CI; использовать управляемый Playwright Chromium и явную установку браузера [apps/web/playwright.config.ts:9]
+- [x] [Review][Patch] Не ограничивать Vitest каталогом `src`, чтобы будущие unit/component tests вне `src` не исчезали из quality gate [apps/web/package.json:12]
+- [x] [Review][Patch] Использовать RFC-compatible UUID fixtures в development preview, чтобы pending mutation проходила серверный `z.string().uuid()` contract [apps/web/src/app/App.tsx:325]
 
 ## Dev Notes
 
@@ -202,6 +205,10 @@ GPT-5 Codex
 - Code review: исправлены все 16 patch findings; browser interaction automation отложена отдельной работой по решению пользователя.
 - Review regression: `pnpm check` проходит; 144 теста (66 web, 76 API, 2 config), API coverage 97.57%, production builds успешны.
 - Review browser QA: 320×800 без horizontal overflow и с initial focus на amount; 1440×900 с form width 760px; console чистая.
+- Deferred interaction coverage RED: новый Playwright flow воспроизвёл невозможность успешного save в development preview из-за невалидных fixture IDs.
+- Deferred interaction coverage GREEN: preview fixtures приведены к UUID-контракту; Chrome E2E покрывает IndexedDB failure/retry, error-summary focus, double-click deduplication, reload recovery и viewport fit на 320×800/1440×900.
+- Final closure gate: `pnpm check` проходит; 148 тестов (66 web unit/component, 4 web E2E, 76 API, 2 config), API coverage 97.57%, lint/typecheck/build успешны.
+- Final adversarial review: 3 patch findings исправлены — managed Playwright Chromium с явной установкой, полный Vitest discovery с исключением E2E и RFC UUID v4 fixtures; повторный `pnpm check` проходит.
 
 ### Completion Notes List
 
@@ -214,11 +221,14 @@ GPT-5 Codex
 - App lifecycle восстанавливает pending/reference cache, обновляет валидные справочники online и закрывает форму только после durable transaction.
 - Browser QA подтверждает focus/reflow без horizontal overflow на 320×800, центрированную форму 760px на 1440×900 и ровно одну pending row после reload.
 - Review patches усилили IndexedDB lifecycle, outbox/cache validation, stale refresh recovery, form accessibility и duplicate-safe local persistence.
+- Отложенный browser/component interaction test gap закрыт воспроизводимым Playwright suite на управляемом Chromium; тесты включены в стандартный `pnpm test`/`pnpm check` и не зависят от системного Chrome.
+- Development preview использует API-compatible UUID fixtures, поэтому browser flow проверяет тот же validation contract, что и реальный offline save.
 
 ### File List
 
 - `_bmad-output/implementation-artifacts/stories/STORY-016.md`
 - `_bmad-output/implementation-artifacts/deferred-work.md`
+- `.gitignore`
 - `apps/web/src/offline/indexed-db.ts`
 - `apps/web/src/offline/outbox.test.ts`
 - `apps/web/src/offline/outbox.ts`
@@ -235,11 +245,18 @@ GPT-5 Codex
 - `apps/web/src/app/App.test.tsx`
 - `apps/web/src/app/App.tsx`
 - `apps/web/src/styles.css`
+- `apps/web/playwright.config.ts`
+- `apps/web/tests/e2e/offline-expense.spec.ts`
+- `apps/web/package.json`
+- `pnpm-lock.yaml`
 - `_bmad-output/implementation-artifacts/sprint-plan.md`
 - `_bmad-output/implementation-artifacts/sprint-status.yaml`
+- `_bmad-output/implementation-artifacts/deferred-work.md`
 
 ## Change Log
 
 - 2026-07-01: Создан implementation-ready offline expense contract.
 - 2026-07-01: Реализовано durable local-first добавление расхода, reference cache, pending UI и reload recovery; story переведена в review после полного quality gate.
 - 2026-07-02: Code review завершён; 16 patch findings исправлены, browser interaction tests deferred, story возвращена в in-progress.
+- 2026-07-13: Закрыт deferred interaction coverage: добавлены Playwright E2E для failure/retry/focus/double-click/reload/320px/1440px, исправлены UUID fixtures preview, полный quality gate пройден; story переведена в review.
+- 2026-07-13: Финальный adversarial review завершён; 3 findings исправлены, полный quality gate повторно пройден, story переведена в done.
