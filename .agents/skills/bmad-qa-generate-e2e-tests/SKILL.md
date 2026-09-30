@@ -1,6 +1,6 @@
 ---
 name: bmad-qa-generate-e2e-tests
-description: 'Generate end to end automated tests for existing features. Use when the user says "create qa automated tests for [feature]"'
+description: 'Generate automated API and end-to-end tests for implemented features. Use when the user says "create qa automated tests for [feature]"'
 ---
 
 # QA Generate E2E Tests Workflow
@@ -13,16 +13,18 @@ description: 'Generate end to end automated tests for existing features. Use whe
 
 - Bare paths (e.g. `checklist.md`) resolve from the skill root.
 - `{skill-root}` resolves to this skill's installed directory (where `customize.toml` lives).
-- `{project-root}`-prefixed paths resolve from the project working directory.
+- `{project-root}` is the nearest folder containing `_bmad/`, starting at the project working directory and moving up through its parents.
 - `{skill-name}` resolves to the skill directory's basename.
 
 ## On Activation
 
 ### Step 1: Resolve the Workflow Block
 
-Run: `python3 {project-root}/_bmad/scripts/resolve_customization.py --skill {skill-root} --key workflow`
+Run: `uv run {project-root}/_bmad/scripts/resolve_customization.py --skill {skill-root} --project-root {project-root} --key workflow`
 
-**If the script fails**, resolve the `workflow` block yourself by reading these three files in base → team → user order and applying the same structural merge rules as the resolver:
+**If the script is not found**, BMad is not set up here. Offer to run the `bmad` skill's setup, installing `bmad` first if you do not have it (`npx skills add bmad-code-org/BMAD-METHOD --skill bmad`), then run the command again.
+
+**If it fails for any other reason**, resolve the `workflow` block yourself by reading these three files in base → team → user order and applying the same structural merge rules as the resolver:
 
 1. `{skill-root}/customize.toml` — defaults
 2. `{project-root}/_bmad/custom/{skill-name}.toml` — team overrides
@@ -40,17 +42,17 @@ Treat every entry in `{workflow.persistent_facts}` as foundational context you c
 
 ### Step 4: Load Config
 
-Load config from `{project-root}/_bmad/bmm/config.yaml` and resolve:
+Run: `uv run {project-root}/_bmad/scripts/resolve_config.py --project-root {project-root} --key core.project_name --key core.output_folder --key core.active_initiative`
 
-- `project_name`, `user_name`
-- `communication_language`, `document_output_language`
-- `implementation_artifacts`
+- Script not found, or no `output_folder`: BMad is not set up here. Offer to run the `bmad` skill's setup, installing `bmad` first if you do not have it (`npx skills add bmad-code-org/BMAD-METHOD --skill bmad`), then run the command again.
+- No `active_initiative`: drop `/{active_initiative}` from the paths below.
+
 - `date` as system-generated current datetime
-- YOU MUST ALWAYS SPEAK OUTPUT in your Agent communication style with the config `{communication_language}`
+- YOU MUST ALWAYS SPEAK OUTPUT in your Agent communication style
 
 ### Step 5: Greet the User
 
-Greet `{user_name}`, speaking in `{communication_language}`.
+Greet the user.
 
 ### Step 6: Execute Append Steps
 
@@ -62,7 +64,7 @@ Activation is complete. If `activation_steps_prepend` or `activation_steps_appen
 
 - `test_dir` = `{project-root}/tests`
 - `source_dir` = `{project-root}`
-- `default_output_file` = `{implementation_artifacts}/tests/test-summary.md`
+- `default_output_file` = `{output_folder}/{active_initiative}/test-summary-{slug}/test-summary-{slug}.md`, `{slug}` naming the feature tested
 
 ## Execution
 
@@ -167,10 +169,10 @@ If the project needs:
 
 Save summary to: `{default_output_file}`
 
-**Done!** Tests generated and verified. Validate against `./checklist.md`.
+**Done!** Tests generated and verified. Validate against `checklist.md`.
 
 ## On Complete
 
-Run: `python3 {project-root}/_bmad/scripts/resolve_customization.py --skill {skill-root} --key workflow.on_complete`
+Run: `uv run {project-root}/_bmad/scripts/resolve_customization.py --skill {skill-root} --project-root {project-root} --key workflow.on_complete`
 
 If the resolved `workflow.on_complete` is non-empty, follow it as the final terminal instruction before exiting.

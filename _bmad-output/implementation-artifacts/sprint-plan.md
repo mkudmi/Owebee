@@ -16,19 +16,19 @@ Sprint 5 является началом продуктовой UI-разраб�
 - Историческая скорость: 20, 20, 19 и 18 points.
 - Средняя скорость: 19,25 points.
 - Рекомендуемая ёмкость: 19 points.
-- Запланировано: 3 stories, 19 points.
-- Резерв внутри stories обеспечивается уже завершёнными `STORY-022`, sync API и базовым IndexedDB outbox.
+- Запланировано: 3 stories, 24 points — на 5 points выше рекомендуемой ёмкости.
+- Причина превышения: фактический backend sync поддерживает только `sync.test`; expense replay требует domain integration, guest actor isolation и concurrency-safe ledger.
 
 ### Уточнение оценки STORY-017
 
-Оценка PRD в 13 points отражала greenfield-реализацию. Для Sprint 5 используется уточнённая оценка 8 points, потому что уже готовы:
+После проверки кода STORY-017 возвращена к оценке PRD в 13 points. Ранее принятые 8 points опирались на неверное предположение о готовности expense sync backend:
 
-- серверный mutation contract и idempotency ledger (`STORY-022`);
-- `/api/v1/sync/*` и автоматические тесты;
-- базовый IndexedDB outbox и его unit tests;
-- online expense API и неизменяемые валютные snapshots.
+- текущий `SyncService` поддерживает только `sync.test`;
+- существующий ledger не обеспечивает actor-scoped guest/registered identity и безопасный payload collision contract;
+- `ExpenseService` требует transaction-aware refactor для атомарного replay;
+- кроме client replay нужны durable leases/CAS и базовый Sync Center.
 
-Оставшийся объём — клиентский replay, интеграция с expense mutation, UI-состояния и обработка ошибок.
+Для сохранения 10-дневного горизонта нужен отдельный scope/schedule decision; обязательные гарантии сохранности данных и защиты от дублей из story не снимаются.
 
 ## Backlog спринта
 
@@ -66,10 +66,10 @@ Sprint 5 является началом продуктовой UI-разраб�
 - защита от повторного нажатия и дублирования;
 - понятная ошибка storage failure без потери введённых данных.
 
-### STORY-017: Синхронизация после восстановления сети — 8 points
+### STORY-017: Синхронизация после восстановления сети — 13 points
 
 - **Приоритет:** Must Have
-- **Статус:** Not Started
+- **Статус:** Ready for Dev
 - **Зависимости:** `STORY-016`, `STORY-022`
 
 Объём:
@@ -185,9 +185,9 @@ STORY-017 Replay + synced/conflict UI
 
 | День | Целевое завершение | Остаток |
 |---|---|---:|
-| 1 | Старт | 19 |
-| 2 | STORY-024 | 16 |
-| 5 | STORY-016 | 8 |
+| 1 | Старт | 24 |
+| 2 | STORY-024 | 21 |
+| 5 | STORY-016 | 13 |
 | 9 | STORY-017 | 0 |
 | 10 | Hardening и закрытие | 0 |
 

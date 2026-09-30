@@ -1,6 +1,6 @@
 ---
 name: bmad-customize
-description: Authors and updates customization overrides for installed BMad skills. Use when the user says 'customize bmad', 'override a skill', 'change agent behavior', or 'customize a workflow'.
+description: Authors and updates customization overrides for installed BMad skills. Use when the user says 'customize bmad', 'override a skill', 'change agent behavior', or 'customize a workflow'
 ---
 
 # BMad Customize
@@ -13,13 +13,13 @@ When the target's `customize.toml` doesn't expose what the user wants, say so pl
 
 ## Preflight
 
-- No `{project-root}/_bmad/` → BMad isn't installed. Say so, stop.
+- No `{project-root}/_bmad/` → BMad is not set up here. Offer to run the `bmad` skill's setup, installing `bmad` first if you do not have it (`npx skills add bmad-code-org/BMAD-METHOD --skill bmad`). Stop if the user declines.
 - `{project-root}/_bmad/scripts/resolve_customization.py` missing → continue, but Step 6 verify falls back to manual merge.
 - Both present → proceed.
 
 ## Activation
 
-Load `_bmad/config.toml` and `_bmad/config.user.toml` from `{project-root}` for `user_name` (default `BMad`) and `communication_language` (default `English`). Greet. If the user's invocation already names a target skill AND a specific change, jump to Step 3.
+Greet the user. If the user's invocation already names a target skill AND a specific change, jump to Step 3.
 
 ## Step 1: Classify intent
 
@@ -31,7 +31,7 @@ Load `_bmad/config.toml` and `_bmad/config.user.toml` from `{project-root}` for 
 ## Step 2: Discovery
 
 ```
-python3 {skill-root}/scripts/list_customizable_skills.py --project-root {project-root}
+uv run {skill-root}/scripts/list_customizable_skills.py --project-root {project-root}
 ```
 
 Use `--extra-root <path>` (repeatable) if the user has skills installed in additional locations.
@@ -87,7 +87,7 @@ Default by character (policy → team, personal → user), confirm before writin
 3. Write. Create `{project-root}/_bmad/custom/` if needed.
 4. Verify:
    ```
-   python3 {project-root}/_bmad/scripts/resolve_customization.py --skill <install-path> --key <agent-or-workflow>
+   uv run {project-root}/_bmad/scripts/resolve_customization.py --skill <install-path> --project-root {project-root} --key <agent-or-workflow>
    ```
    Show the merged output, point out the changed fields.
 

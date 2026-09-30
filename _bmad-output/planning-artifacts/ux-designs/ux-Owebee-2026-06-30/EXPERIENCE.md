@@ -156,8 +156,9 @@ During background refresh, usable cached content remains in place. No data regio
 - Pending expenses remain in the normal expense list and survive PWA restart.
 - Global status progresses through: Offline → Waiting to sync → Syncing → Synced, Failed, or Needs attention.
 - Routine “Synced” feedback may recede after five seconds; pending, failed, offline, and conflict states persist.
-- A conflict comparison shows only changed fields under “Current trip version” and “Your offline change.”
-- “Apply my values” appears only when authorization still permits it. Otherwise the person can keep/copy the local draft before dismissal.
+- A conflict comparison shows only changed fields under “Current trip version” and “Your offline change” when the Sync API provides a trustworthy server snapshot.
+- Scoped Sprint 5 decision for `STORY-017`: `expense.create` without a server snapshot shows the full local draft and reason in read-only form with Copy; changed-field comparison, “Apply my values,” accept-current and discard are deferred until the API guarantees safe resolution semantics.
+- “Apply my values” may appear in later mutation flows only when authorization and the Sync API explicitly permit it. Otherwise the person can keep/copy the local draft.
 - Neither a retry nor a reconnect can duplicate an expense.
 
 ## Accessibility Floor
@@ -239,7 +240,7 @@ Failure: rate lookup offers a custom rate; validation focuses the error summary;
 5. Connectivity returns. Global status moves through “Syncing 1 of 1.”
 6. **Climax:** The same row changes to “Synced,” the balance refreshes once, and a polite announcement confirms completion without moving focus.
 
-Failure: a safe retry remains pending. A version/permission conflict becomes “Needs attention,” preserves the local payload, and opens the changed-field comparison shown in [Sync conflict](mockups/sync-conflict.html).
+Failure: a safe retry remains pending. A version/permission conflict becomes “Needs attention” and preserves the local payload. When the Sync API provides a trustworthy server snapshot, it may open the changed-field comparison shown in [Sync conflict](mockups/sync-conflict.html). In Sprint 5 `STORY-017`, `expense.create` without that snapshot instead opens the full local draft read-only with Copy and no resolution action.
 
 ### Flow 5: Просмотр баланса
 
@@ -261,7 +262,7 @@ These decisions do not change the interaction spine above, but they must resolve
 2. Family domain model: aggregate record only or named member records beneath the aggregate.
 3. Share-count changes: recalculate existing expenses or affect future/default splits only.
 4. Supported currency catalog, decimal display rules, and provider-attribution wording.
-5. Conflict actions supported by the Sync API beyond accept-current and retry-local.
+5. Conflict actions supported by the Sync API beyond read-only review/copy. Sprint 5 `STORY-017` intentionally ships no apply/accept/discard action for `expense.create`.
 6. Retention, recovery, and participant-facing outcome after trip deletion.
 
 Until resolved, UI copy and controls must not imply behavior that the domain model or API cannot guarantee.

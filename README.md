@@ -54,7 +54,11 @@ pnpm check
 
 ## BMAD Artifacts
 
-BMAD Method v6 stores generated artifacts under:
+Навыки BMAD установлены из [официального BMAD-METHOD](https://github.com/bmad-code-org/BMAD-METHOD) в `.agents/skills/`; общий runtime находится в `_bmad/`. Для обновления навыков используйте `npx skills update -p -y`, затем запустите `bmad setup` в Codex.
+
+Существующие документы созданы по структуре BMAD v6 и пока находятся в:
 
 - `_bmad-output/planning-artifacts/`
 - `_bmad-output/implementation-artifacts/`
+
+Перенос этих документов в структуру initiative/ticket BMAD v7 требует отдельной миграции.

@@ -59,7 +59,7 @@ Rubric walker prompt:
 >
 > Return ONLY a compact summary: overall verdict, per-section verdicts, finding counts by severity, file path.
 
-The gate may dispatch `{workflow.finalize_reviewers}` and ad-hoc reviewers (accessibility for consumer / regulated). Each writes `review-{slug}.md` and returns a compact summary. Parallel.
+The gate may dispatch `{workflow.finalize_reviewers}` and ad-hoc reviewers (accessibility for consumer / regulated). Each writes `review-{lens}.md` and returns a compact summary. Parallel.
 
 ## Synthesis pipeline
 
@@ -69,7 +69,7 @@ Under Validate intent, after every reviewer returns, render one consolidated rep
 2. Fill `{workflow.validation_report_template}`. No overall grade — the per-category verdicts and severity counts already say what's true. Synthesis paragraph lifts the rubric's overall verdict; add a second if extra reviewers shift the picture. One section per rubric category (open if thin / broken), one per extra reviewer (closed, adversarial voice preserved).
 3. Write `{doc_workspace}/validation-report.html`.
 4. Write the Markdown twin `{doc_workspace}/validation-report.md` — same content grouped by severity.
-5. Open HTML: `python3 -c "import webbrowser, pathlib; webbrowser.open(pathlib.Path('{doc_workspace}/validation-report.html').resolve().as_uri())"`. Skip headless.
+5. Open HTML with the platform opener — `open "{doc_workspace}/validation-report.html"` on macOS, `xdg-open` on Linux, `start ""` on Windows, path always double-quoted. On failure, give the user the path instead. Skip headless.
 
 Re-running overwrites the consolidated report; individual `review-*.md` files persist.
 
